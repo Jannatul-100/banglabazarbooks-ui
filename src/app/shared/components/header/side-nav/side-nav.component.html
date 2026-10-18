@@ -1,0 +1,107 @@
+<aside class="side-nav" [class.active]="showHideSideNav">
+  <div class="side-nav-top">
+    <div class="logo">
+      <img src="/images/logo/banglabazar-books-logo.png" alt="বাংলাবাজার বুকস" loading="lazy" />
+    </div>
+    <button class="close-btn" aria-label="Close Navigation" (click)="onshowHideSideNav()">
+      <i class="fa fa-xmark"></i>
+    </button>
+  </div>
+  <div class="side-nav-middle">
+    <ul>
+      <li>
+        <a routerLink="/" (click)="onshowHideSideNav()">
+          <i class="fa-solid fa-house"></i>
+          <span>{{ 'ln.Home1' | translate }}</span>
+        </a>
+      </li>
+
+      <li>
+        <a routerLink="/product-list" (click)="onshowHideSideNav()">
+          <i class="fa-solid fa-book"></i>
+          <span>{{ 'ln.AllBooks' | translate }}</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/author-list" (click)="onshowHideSideNav()">
+          <i class="fas fa-code-branch"></i>
+          <span>{{ 'ln.Authors' | translate }}</span>
+        </a>
+      </li>
+
+      <li>
+        <a routerLink="/publisher-list" (click)="onshowHideSideNav()">
+          <i class="fas fa-building"></i>
+          <span>{{ 'ln.Publications' | translate }}</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/offers" (click)="onshowHideSideNav()">
+          <i class="fas fa-star"></i>
+          <span>{{ 'ln.Offer' | translate }}</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/special-package" (click)="onshowHideSideNav()">
+          <i class="fa-solid fa-box-open"></i>
+          <span>{{ 'ln.SpecialPackage' | translate }}</span>
+        </a>
+      </li>
+
+      <li>
+        <a routerLink="/login" rel="nofollow" (click)="onshowHideSideNav()">
+          <i class="fas fa-user-circle"></i>
+          <span>{{ 'ln.Login' | translate }}</span>
+        </a>
+      </li>
+
+      <!-- <li>
+        <a routerLink="/pages/about-us" (click)="onshowHideSideNav()">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>{{ 'ln.AboutUs' | translate }}</span>
+        </a>
+      </li> -->
+
+      <!-- <li>
+        <button (click)="onshowHideSideNav()" aria-label="Open Categories">
+          <i class="fas fa-bars"></i>
+          <span>{{ 'ln.Category' | translate }}</span>
+        </button>
+      </li> -->
+
+
+      <!-- <li>
+        <a routerLink="/blogs" (click)="onshowHideSideNav()">
+          <i class="fas fa-globe"></i>
+          <span>{{ 'ln.Blog' | translate }}</span>
+        </a>
+      </li> -->
+
+
+
+      <li>
+        <a routerLink="/contact-us" (click)="onshowHideSideNav()">
+          <i class="fas fa-phone-alt"></i>
+          <span>{{ 'ln.ContactUs' | translate }}</span>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="side-nav-bottom">
+    <div class="social-links">
+      @if (shopInfo()?.socialLinks && shopInfo()?.socialLinks!.length > 0) {
+      <a [attr.href]="shopInfo()?.socialLinks![0]?.value || null" target="_blank" rel="noopener noreferrer"
+        aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a [attr.href]="shopInfo()?.socialLinks![1]?.value || null" target="_blank" rel="noopener noreferrer"
+        aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      <a [attr.href]="shopInfo()?.socialLinks![2]?.value || null" target="_blank" rel="noopener noreferrer"
+        aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+      }
+    </div>
+  </div>
+</aside><!-- END SIDE NAV -->
+
+@if (showHideSideNav) {
+<div class="side-nav-overlay" (click)="onshowHideSideNav()"></div>
+}

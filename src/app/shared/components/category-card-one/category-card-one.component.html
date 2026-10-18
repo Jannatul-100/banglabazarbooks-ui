@@ -1,0 +1,21 @@
+<a class="category-card" [routerLink]="['/product-list']"
+  [queryParams]="{ categories: data()?.slug, categoryId: data()?._id }"
+  [attr.aria-label]="(translateService.currentLang === 'en' ? data()?.nameEn : data()?.name) || data()?.name">
+  <div class="category-card__image">
+    @if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+    <img [src]="data()?.image" [alt]="data()?.name || ''" width="120" height="100" loading="lazy" decoding="async">
+    } @else {
+    <img [src]="data()?.mobileImage || data()?.image" [alt]="data()?.nameEn || data()?.name || ''" width="120"
+      height="100" loading="lazy" decoding="async">
+    }
+  </div>
+  <div class="category-card__footer">
+    <span class="category-card__label">
+      @if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+      {{ data()?.name }}
+      } @else {
+      {{ data()?.nameEn || data()?.name }}
+      }
+    </span>
+  </div>
+</a>

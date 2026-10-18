@@ -1,0 +1,117 @@
+$dark-primary-text: rgba(black, 0.87);
+$dark-secondary-text: rgba(black, 0.54);
+$dark-disabled-text: rgba(black, 0.38);
+$dark-dividers: rgba(black, 0.12);
+$dark-focused: rgba(black, 0.12);
+$light-primary-text: white;
+$light-secondary-text: rgba(white, 0.7);
+$light-disabled-text: rgba(white, 0.5);
+$light-dividers: rgba(white, 0.12);
+$light-focused: rgba(white, 0.12);
+
+
+
+
+// Primary — brand yellow
+$mat-soft-primary: (
+  50 : #fffde7,
+  100 : #fff9c4,
+  200 : #fff59d,
+  300 : #ffee58,
+  400 : #f8d020,
+  500 : #f5c518,
+  600 : #e0b015,
+  700 : #c99a10,
+  800 : #a67f0d,
+  900 : #7a5e09,
+  A100 : #ffff8d,
+  A200 : #ffff00,
+  A400 : #ffea00,
+  A700 : #ffd600,
+  contrast: (
+      50 : #2a2416,
+      100 : #2a2416,
+      200 : #2a2416,
+      300 : #2a2416,
+      400 : #2a2416,
+      500 : #2a2416,
+      600 : #2a2416,
+      700 : #ffffff,
+      800 : #ffffff,
+      900 : #ffffff,
+      A100 : #2a2416,
+      A200 : #2a2416,
+      A400 : #2a2416,
+      A700 : #2a2416,
+  )
+);
+
+
+
+// Accent — brand dark brown
+$mat-soft-accent: (
+  50 : #f5f3ee,
+  100 : #e6e0d3,
+  200 : #d4cbb5,
+  300 : #b8aa8a,
+  400 : #6b5f42,
+  500 : #3a3420,
+  600 : #2f2b1c,
+  700 : #252218,
+  800 : #1a1810,
+  900 : #0f0e09,
+  A100 : #f5c518,
+  A200 : #e0b015,
+  A400 : #c99a10,
+  A700 : #a67f0d,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $light-primary-text,
+    400: $light-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $dark-primary-text,
+    A400: $dark-primary-text,
+    A700: $dark-primary-text,
+  )
+);
+
+// Warn
+$mat-soft-warn: (
+  50 : #ffebe7,
+  100 : #ffcdc2,
+  200 : #ffab99,
+  300 : #ff8970,
+  400 : #ff7052,
+  500 : #ff5733,
+  600 : #ff4f2e,
+  700 : #ff4627,
+  800 : #ff3c20,
+  900 : #ff2c14,
+  A100 : #ffffff,
+  A200 : #fffbfb,
+  A400 : #ffccc8,
+  A700 : #ffb4ae,
+  contrast: (
+    50: $dark-primary-text,
+    100: $dark-primary-text,
+    200: $dark-primary-text,
+    300: $light-primary-text,
+    400: $light-primary-text,
+    500: $light-primary-text,
+    600: $light-primary-text,
+    700: $light-primary-text,
+    800: $light-primary-text,
+    900: $light-primary-text,
+    A100: $dark-primary-text,
+    A200: $light-primary-text,
+    A400: $light-primary-text,
+    A700: $light-primary-text,
+  )
+);

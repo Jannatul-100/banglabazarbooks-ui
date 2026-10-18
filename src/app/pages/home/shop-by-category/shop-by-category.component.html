@@ -1,0 +1,24 @@
+<section class="shop-category">
+  <div class="container">
+    <div class="shop-category-main">
+      <div class="category-track">
+        @if (isLoadingCategoryMenu()) {
+          @for (data of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track data) {
+            <app-category-loader-card></app-category-loader-card>
+          }
+        } @else {
+          @for (data of categories(); track data._id || $index) {
+            <app-category-card-one [data]="data"></app-category-card-one>
+          }
+
+          <div class="shop-category-card">
+            <a routerLink="/category-list" class="shop-card-title">
+              <i class="fa-sharp fa-solid fa-bars"></i>
+              <span>{{ "ln.SeeMore" | translate }}</span>
+            </a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>

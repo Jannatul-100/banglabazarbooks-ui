@@ -1,0 +1,43 @@
+@use 'src/theme/variables' as *;
+
+.seo-internal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 24px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.seo-internal-links a {
+  color: $brand-brown-text;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 8px 14px;
+  border: 1px solid rgba($brand-yellow, 0.45);
+  border-radius: 999px;
+  background: $color-white;
+  transition: all 0.2s linear;
+  white-space: nowrap;
+}
+
+.seo-internal-links a:hover {
+  color: $brand-brown-text;
+  background: $brand-yellow-light;
+  border-color: $brand-yellow;
+}
+
+@media (max-width: 600px) {
+  .seo-internal-links {
+    gap: 8px;
+    justify-content: center;
+    margin: 16px 0;
+    padding: 0 8px;
+  }
+
+  .seo-internal-links a {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+}

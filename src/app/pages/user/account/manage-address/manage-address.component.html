@@ -1,0 +1,121 @@
+<div class="address-container">
+  <div class="address-header">
+    <div class="header-info">
+      <h2>আমার ঠিকানা</h2>
+      <p>আপনার ডেলিভারি অ্যাড্রেসগুলো এখান থেকে ম্যানেজ করুন।</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="onAddAddress()" *ngIf="!showForm()">
+      <i class="fa fa-plus"></i> নতুন অ্যাড্রেস যোগ করুন
+    </button>
+  </div>
+
+  @if (showForm()) {
+    <div class="address-form-card animated fadeIn">
+      <div class="card-header">
+        <h3>{{ editingId() ? 'অ্যাড্রেস আপডেট করুন' : 'নতুন অ্যাড্রেস যোগ করুন' }}</h3>
+        <button mat-icon-button (click)="showForm.set(false)"><i class="fa fa-times"></i></button>
+      </div>
+
+      <form [formGroup]="addressForm" (ngSubmit)="onSubmit()" class="address-form">
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>পুরো নাম</mat-label>
+            <input matInput formControlName="name" placeholder="প্রাপকের নাম">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>মোবাইল নাম্বার</mat-label>
+            <input matInput formControlName="phone" placeholder="০১৭XXXXXXXX">
+          </mat-form-field>
+        </div>
+
+        <div class="form-grid tertiary">
+          <mat-form-field appearance="outline">
+            <mat-label>বিভাগ</mat-label>
+            <mat-select formControlName="division" (selectionChange)="onDivisionChange($event.value)">
+              @for (div of divisions(); track div._id) {
+                <mat-option [value]="div._id">{{ div.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>জেলা/শহর</mat-label>
+            <mat-select formControlName="area" (selectionChange)="onAreaChange($event.value)">
+              @for (area of areas(); track area._id) {
+                <mat-option [value]="area._id">{{ area.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>থানা/উপজেলা</mat-label>
+            <mat-select formControlName="zone">
+              @for (zone of zones(); track zone._id) {
+                <mat-option [value]="zone._id">{{ zone.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline">
+          <mat-label>বিস্তারিত ঠিকানা</mat-label>
+          <textarea matInput formControlName="address" rows="3" placeholder="বাসা নং, রোড নং, এলাকা..."></textarea>
+        </mat-form-field>
+
+        <div class="form-footer">
+          <mat-checkbox formControlName="setDefaultAddress">ডিফল্ট অ্যাড্রেস হিসেবে সেট করুন</mat-checkbox>
+          <div class="action-btns">
+            <button mat-button type="button" (click)="showForm.set(false)">বাতিল</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="addressForm.invalid">
+              {{ editingId() ? 'আপডেট করুন' : 'সংরক্ষণ করুন' }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="loader-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="address-list">
+      @for (addr of addresses(); track addr._id) {
+        <div class="address-card animated fadeInUp" [class.default]="addr.setDefaultAddress">
+          <div class="card-body">
+            <div class="status-tags">
+              <span class="type-tag">{{ addr.addressType || 'Home' }}</span>
+              @if (addr.setDefaultAddress) {
+                <span class="default-tag">Default</span>
+              }
+            </div>
+            <h3>{{ addr.name }}</h3>
+            <p class="phone"><i class="fa fa-phone"></i> {{ addr.phone }}</p>
+            <p class="location">
+              <i class="fa fa-map-marker-alt"></i>
+              {{ addr.address }}, {{ addr.zone?.name }}, {{ addr.area?.name }}, {{ addr.division?.name }}
+            </p>
+          </div>
+          <div class="card-actions">
+            <button mat-icon-button [matMenuTriggerFor]="menu"><i class="fa fa-ellipsis-v"></i></button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onEditAddress(addr)"><i class="fa fa-edit"></i> এডিট করুন</button>
+              @if (!addr.setDefaultAddress) {
+                <button mat-menu-item (click)="onSetDefault(addr._id!)"><i class="fa fa-check-circle"></i> ডিফল্ট সেট করুন</button>
+              }
+              <button mat-menu-item class="delete-btn" (click)="onDeleteAddress(addr._id!)"><i class="fa fa-trash"></i> মুছে ফেলুন</button>
+            </mat-menu>
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <i class="fa fa-map-marked-alt"></i>
+          <h3>কোনো সংরক্ষিত ঠিকানা নেই</h3>
+          <p>আপনার প্রথম ডেলিভারি অ্যাড্রেসটি যোগ করুন।</p>
+        </div>
+      }
+    </div>
+  }
+</div>

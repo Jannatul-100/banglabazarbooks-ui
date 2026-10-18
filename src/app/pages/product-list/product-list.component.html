@@ -1,0 +1,220 @@
+<section class="product-list">
+  <div class="container">
+    <div class="title-area">
+      <div class="title-area-left">
+        <div class="title-row">
+          <h1 [class.english-font]="translateService.currentLang === 'en'">
+            @if (publisherName()) {
+            {{ publisherName() }}
+            } @else if (authorName()) {
+            {{ authorName() }}
+            } @else if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+            {{ slugCategory()?.name ?? "আমাদের প্রকাশিত বইসমূহ" }}
+            } @else {
+            {{ slugCategory()?.nameEn ?? "Our All published books" }}
+            }
+          </h1>
+          @if (totalProductsCount() > 0) {
+          <span class="total-books-counter">
+            <i class="fa fa-book-open"></i> মোট {{ totalProductsCount() }} টি বই
+          </span>
+          }
+        </div>
+        @if (publisherDescription()) {
+        <div class="publisher-description-card">
+          <div class="publisher-desc-badge">
+            <i class="fa-solid fa-building"></i>
+            <span>প্রকাশনী পরিচিতি</span>
+          </div>
+          <div class="publisher-desc-text" [innerHTML]="publisherDescription() | safeHtml"></div>
+        </div>
+        }
+      </div>
+
+      <div class="product-sort-container">
+        <div class="product-sort-box">
+          <label><i class="fa fa-arrow-down-short-wide"></i> সাজান:</label>
+          <select [ngModel]="selectedSort()" (ngModelChange)="onSortChange($event)">
+            <option value="">ডিফল্ট (জনপ্রিয়)</option>
+            <option value="new_release">নতুন প্রকাশিত</option>
+            <option value="best_seller">বেস্ট সেলার</option>
+            <option value="price_low_to_high">মূল্য: কম থেকে বেশি</option>
+            <option value="price_high_to_low">মূল্য: বেশি থেকে কম</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="category-list-responsive-parent">
+      @if (categories().length) {
+      <div class="category-list-responsive">
+        <ul>
+          @for (data of categories(); track data._id) {
+          <li [routerLink]="['/product-list']" [queryParams]="{ categories: data?.slug, categoryId: data?._id }" queryParamsHandling="merge">
+            <button type="button" [class.active]="slug === data?.slug">
+              {{ data?.name }}
+            </button>
+          </li>
+          }
+        </ul>
+      </div>
+      }
+
+      @if (subCategories().length) {
+      <div class="category-list-responsive">
+        <ul>
+          @for (data of subCategories(); track data._id) {
+          <li [routerLink]="['/product-list']" [queryParams]="{ subCategory: data?.slug, subCategoryId: data?._id }" queryParamsHandling="merge">
+            <button type="button" [class.active]="subCategorySlug === data?.slug">
+              {{ data?.name }}
+            </button>
+          </li>
+          }
+        </ul>
+      </div>
+      }
+    </div>
+
+    <div class="product-list-main">
+      <div class="product-list-left">
+        <div class="product-filter-area" [class.filter-slide-active]="filterSlide()"
+          [class.filter-slide-inactive]="!filterSlide()">
+
+          <!-- Categories Filter -->
+          <div class="filtered">
+            <div class="filter-title">
+              <h3>{{ 'ln.Categories' | translate }}</h3>
+            </div>
+            <div class="filter-search">
+              <i class="fa fa-search"></i>
+              <input type="text" [placeholder]="'ln.SearchCategory' | translate"
+                [ngModel]="categorySearch()" (ngModelChange)="categorySearch.set($event)" />
+            </div>
+            <div class="filter-body">
+              <ul>
+                @for (data of filteredCategories(); track data._id) {
+                <li [routerLink]="['/product-list']" [queryParams]="{ categories: data?.slug, categoryId: data?._id }" queryParamsHandling="merge">
+                  <p [class.active]="slug === data?.slug">
+                    <span><small></small></span>
+                    {{ data?.name }}
+                  </p>
+                </li>
+                }
+              </ul>
+            </div>
+            <div class="filter-btn">
+              <button type="button" (click)="onClearFilter('category')">
+                <i class="fa fa-trash"></i> {{ 'ln.Clear' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Sub Categories Filter -->
+          @if (subCategories().length) {
+          <div class="filtered">
+            <div class="filter-title">
+              <h3>{{ 'ln.SubCategories' | translate }}</h3>
+            </div>
+            <div class="filter-search">
+              <i class="fa fa-search"></i>
+              <input type="text" [placeholder]="'ln.SearchSubCategory' | translate"
+                [ngModel]="subCategorySearch()" (ngModelChange)="subCategorySearch.set($event)" />
+            </div>
+            <div class="filter-body">
+              <ul>
+                @for (data of filteredSubCategories(); track data._id) {
+                <li [routerLink]="['/product-list']"
+                  [queryParams]="{ subCategory: data?.slug, subCategoryId: data?._id }"
+                  queryParamsHandling="merge">
+                  <p [class.active]="subCategorySlug === data?.slug">
+                    <span><small></small></span>
+                    {{ data?.name }}
+                  </p>
+                </li>
+                }
+              </ul>
+            </div>
+            <div class="filter-btn">
+              <button type="button" (click)="onClearFilter('subCategory')">
+                <i class="fa fa-trash"></i> {{ 'ln.Clear' | translate }}
+              </button>
+            </div>
+          </div>
+          }
+
+          <!-- Publishers Filter -->
+          <div class="filtered">
+            <div class="filter-title">
+              <h3>{{ 'ln.Publications' | translate }}</h3>
+            </div>
+            <div class="filter-search">
+              <i class="fa fa-search"></i>
+              <input type="text" [placeholder]="'ln.SearchPublisherByName' | translate"
+                [ngModel]="publisherSearch()" (ngModelChange)="publisherSearch.set($event)" />
+            </div>
+            <div class="filter-body">
+              <ul>
+                @for (data of filteredPublishers(); track data._id) {
+                <li [routerLink]="['/product-list']" [queryParams]="{ publisher: data?.slug, publisherId: data?._id }" queryParamsHandling="merge">
+                  <p [class.active]="publisherSlug === data?.slug">
+                    <span><small></small></span>
+                    {{ data?.name }}
+                  </p>
+                </li>
+                }
+              </ul>
+            </div>
+            <div class="filter-btn">
+              <button type="button" (click)="onClearFilter('publisher')">
+                <i class="fa fa-trash"></i> {{ 'ln.Clear' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Authors Filter -->
+          <div class="filtered">
+            <div class="filter-title">
+              <h3>{{ 'ln.Author' | translate }}</h3>
+            </div>
+            <div class="filter-search">
+              <i class="fa fa-search"></i>
+              <input type="text" [placeholder]="'ln.SearchAuthorByName' | translate"
+                [ngModel]="authorSearch()" (ngModelChange)="authorSearch.set($event)" />
+            </div>
+            <div class="filter-body">
+              <ul>
+                @for (data of filteredAuthors(); track data._id) {
+                <li [routerLink]="['/product-list']" [queryParams]="{ author: data?.slug, id: data?._id }" queryParamsHandling="merge">
+                  <p [class.active]="authorSlug === data?.slug">
+                    <span><small></small></span>
+                    {{ data?.name }}
+                  </p>
+                </li>
+                }
+              </ul>
+            </div>
+            <div class="filter-btn">
+              <button type="button" (click)="onClearFilter('author')">
+                <i class="fa fa-trash"></i> {{ 'ln.Clear' | translate }}
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="product-list-right">
+        <app-products (productsChange)="onProductsChange($event)" (totalProductsChange)="totalProductsCount.set($event)"></app-products>
+      </div>
+    </div>
+
+    @if (listBanners().length) {
+    <app-poster-card-one [data]="listBanners()"></app-poster-card-one>
+    }
+
+    <app-seo-internal-links></app-seo-internal-links>
+  </div>
+</section>
+
+@if (filterSlide()) {
+<div class="overlay" (click)="filterSlideToggle()"></div>
+}

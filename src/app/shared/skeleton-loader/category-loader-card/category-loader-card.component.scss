@@ -1,0 +1,12 @@
+.category-skeleton {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .category-skeleton {
+    width: 108px;
+    flex-shrink: 0;
+  }
+}

@@ -1,0 +1,137 @@
+.dialog-container {
+  padding: 16px;
+  max-width: 600px;
+  width: 100%;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+  }
+}
+
+.description {
+  margin-bottom: 16px;
+  color: #666;
+  font-size: 14px;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.action-btn {
+  text-align: right;
+  margin-top: 8px;
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 8px;
+
+  h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.matched-list {
+  max-height: 350px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.product-item {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  align-items: center;
+
+  .product-img {
+    width: 60px;
+    height: 80px;
+    flex-shrink: 0;
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  .product-info {
+    flex-grow: 1;
+
+    .product-name {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .product-author {
+      margin: 0 0 4px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .product-price {
+      .sale-price {
+        font-weight: 700;
+        color: #e53935;
+        font-size: 16px;
+        margin-right: 8px;
+      }
+      .regular-price {
+        color: #999;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+.no-matched-msg {
+  text-align: center;
+  padding: 24px;
+  color: #d32f2f;
+  font-weight: 500;
+}
+
+.unmatched-list {
+  background: #fff3f3;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+
+  h4 {
+    margin: 0 0 8px;
+    color: #d32f2f;
+    font-size: 14px;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #555;
+    font-size: 13px;
+    li {
+      margin-bottom: 4px;
+    }
+  }
+}

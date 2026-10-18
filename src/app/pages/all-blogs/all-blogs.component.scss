@@ -1,0 +1,128 @@
+@use 'src/theme/variables' as *;
+
+.section {
+  display: block;
+  padding: 36px 0 56px;
+  background-color: transparent;
+  min-height: 80vh;
+
+  .section-main {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 28px 24px;
+  }
+}
+
+.title-area {
+  margin-bottom: 20px;
+  text-align: center;
+
+  .title-area-left {
+    h1 {
+      display: inline-block;
+      color: $color-on-primary;
+      background: linear-gradient(135deg, $brand-brown-dark 0%, $brand-brown 100%);
+      border: 2px solid rgba($brand-yellow, 0.5);
+      font-family: $font-bn-primary;
+      font-size: 28px;
+      line-height: 1.2;
+      padding: 12px 36px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba($brand-brown-dark, 0.15);
+      margin: 0 !important;
+    }
+  }
+}
+
+.page-intro {
+  max-width: 920px;
+  margin: 0 auto 32px !important;
+  text-align: center;
+  color: rgba($brand-brown-text, 0.78);
+  line-height: 1.85;
+  font-size: 15px;
+  font-family: $font-bn-primary;
+  padding: 16px 20px;
+  background: rgba($color-white, 0.85);
+  border: 1px solid rgba($brand-yellow, 0.3);
+  border-radius: 12px;
+
+  a {
+    display: inline;
+    color: $brand-brown;
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba($brand-yellow, 0.6);
+
+    &:hover {
+      color: $brand-yellow-hover;
+    }
+  }
+}
+
+.blog-item {
+  height: 100%;
+}
+
+.blog-skeleton {
+  background: $color-white;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba($brand-yellow, 0.25);
+  box-shadow: 0 4px 14px rgba($brand-brown-dark, 0.05);
+
+  .skeleton-image {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(110deg, $brand-cream 8%, $brand-yellow-light 18%, $brand-cream 33%);
+    background-size: 200% 100%;
+    animation: shine 1.5s linear infinite;
+  }
+
+  .skeleton-content {
+    padding: 18px 20px;
+
+    .skeleton-line {
+      height: 14px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      background: linear-gradient(110deg, $brand-cream 8%, $brand-yellow-light 18%, $brand-cream 33%);
+      background-size: 200% 100%;
+      animation: shine 1.5s linear infinite;
+
+      &.short {
+        width: 55%;
+      }
+    }
+  }
+}
+
+@keyframes shine {
+  to {
+    background-position-x: -200%;
+  }
+}
+
+@media (max-width: 1100px) {
+  .section .section-main {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .section .section-main {
+    grid-template-columns: 1fr;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  .title-area .title-area-left h1 {
+    font-size: 22px;
+    padding: 10px 24px;
+  }
+
+  .page-intro {
+    font-size: 14px;
+    padding: 14px 16px;
+  }
+}

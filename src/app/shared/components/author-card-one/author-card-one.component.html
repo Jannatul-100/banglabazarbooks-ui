@@ -1,0 +1,16 @@
+@if (data) {
+  @if (linkType === 'publisher') {
+  <a class="author-card" [id]="data._id" [routerLink]="['/product-list']"
+    [queryParams]="{ publisher: data.slug, publisherId: data._id }">
+    <img [src]="data.image || '/images/avatar/user_low.png'" [alt]="data.name" aria-hidden="true"
+      (error)="$any($event.target).src = '/images/avatar/user_low.png'">
+    <p>{{ translateService.currentLang === 'en' ? (data.nameEn || data.name) : (data.name || data.nameEn) }}</p>
+  </a>
+  } @else {
+  <a class="author-card" [id]="data._id" [routerLink]="['/author', data.slug]">
+    <img [src]="data.image || '/images/avatar/user_low.png'" [alt]="data.name" aria-hidden="true"
+      (error)="$any($event.target).src = '/images/avatar/user_low.png'">
+    <p>{{ translateService.currentLang === 'en' ? (data.nameEn || data.name) : (data.name || data.nameEn) }}</p>
+  </a>
+  }
+}

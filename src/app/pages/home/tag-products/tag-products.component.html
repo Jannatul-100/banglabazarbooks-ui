@@ -1,0 +1,54 @@
+@if (tag().image) {
+<section class="tag-banner">
+  <div class="container">
+    @if (!isLoading()) {
+    <a class="tag-banner__link" [href]="tag().url || '/'" [attr.aria-label]="tag().name || 'Banner'">
+      <img [src]="tag().image" [alt]="tag().name || 'Banner'" loading="lazy" />
+    </a>
+    } @else {
+    <div class="tag-banner__loader"></div>
+    }
+  </div>
+</section>
+}
+
+@if (isLoading() || products().length > 0) {
+<section class="tag-products">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title">{{ tag().name }}</h2>
+      @if (tag().slug) {
+      <a [routerLink]="['/product-list']" [queryParams]="{ tags: tag().slug }" class="view-all-btn">
+        {{ 'ln.SeeMore' | translate }}
+      </a>
+      }
+    </div>
+
+    <div class="products-carousel">
+      @if (isBrowser) {
+      <swiper-container #swiperEl init="false" ngSkipHydration class="tag-products-swiper">
+        @if (isLoading()) {
+          @for (item of skeletonItems; track item) {
+          <swiper-slide>
+            <app-card-one-loader></app-card-one-loader>
+          </swiper-slide>
+          }
+        } @else {
+          @for (item of products(); track item._id || $index) {
+          <swiper-slide>
+            <app-product-card-one [data]="item"></app-product-card-one>
+          </swiper-slide>
+          }
+        }
+      </swiper-container>
+      } @else if (!isLoading()) {
+      <div class="products-grid">
+        @for (item of products(); track item._id || $index) {
+        <app-product-card-one [data]="item"></app-product-card-one>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</section>
+}

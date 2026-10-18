@@ -1,0 +1,130 @@
+
+/*** font-family ****/
+$font-en-primary: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+$font-bn-primary: "Noto Serif Bengali", "Hind Siliguri", serif;
+$font-en-primary2: "Roboto", sans-serif;
+$font-en-primary3: "Open Sans", sans-serif;
+$font-en-secondery: "Barlow", sans-serif;
+$font-en-secondery1: "Baloo Da 2", sans-serif;
+$font-jost-medium: "Jost-Medium", sans-serif;
+$font-jost-regular: "Jost-Regular", sans-serif;
+$font-jost-semiBold: "Jost-SemiBold", sans-serif;
+$bangla-kalpurush: "Hind Siliguri", "hind-siliguri", sans-serif;
+$bangla-kalpurush-ANSI: "kalpurush-ANSI", sans-serif;
+$bangla-sagarnormal: "sagarnormal", sans-serif;
+$bangla-akaashnormal: "akaashnormal", sans-serif;
+$bangla-PoshurMJ-Bold: "PoshurMJ-Bold", sans-serif;
+$bangla-SutonnyMJ-Bold: "SutonnyMJ-Bold", sans-serif;
+$bangla-SolaimanLipi_Bold: "SolaimanLipi_Bold", sans-serif;
+
+$font-family1: 'Satisfy', cursive;
+$font-family2: 'Noto Sans', sans-serif;
+$font-family3: 'Siyam Rupali', sans-serif;
+
+
+$bank-gothic-medium: "bank_gothic_medium", "arial", sans-serif;
+$nexa-bold: "nexa_bold", "arial", sans-serif;
+$nexa-light: "nexa_light", "arial", sans-serif;
+$cocon-regular: "cocon_regular", "arial", sans-serif;
+$shorif-jonota: "shorif_jonota", sans-serif;
+$segoe_ui_regular: "segoe_ui_regular", sans-serif;
+$segoe_ui_bold: "segoe_ui_bold", sans-serif;
+$shorif-jonota: "shorif_jonota", sans-serif;
+
+/**** containerr ***/
+$container-max-width: 1440px;
+
+// MAT TOOLBAR, SIDENAV & LIST
+$toolbar-height: 85px;
+$toolbar-height-sm: 65px;
+$mat-sidenav-width: 295px;
+$list-hover-color: #c8d5e4;
+$list-text-color: #4a4a4a;
+$list-text-size: 15.5px;
+$text-color-two: #888;
+// BREAKPOINTS
+$max-tablet-width: 899px;
+
+// COLOR
+// Brand palette — Banglabazar Books logo
+$brand-yellow: #f5c518;
+$brand-yellow-hover: #e0b015;
+$brand-yellow-light: #fff3c4;
+$brand-brown-dark: #2f2b1c;
+$brand-brown-darker: #252218;
+$brand-brown: #3a3420;
+$brand-brown-text: #2a2416;
+$brand-cream: #fff8e7;
+$brand-cream-bg: #fdf9f0;
+$brand-doodle-bg: url('/webdoodle.jpg');
+$brand-doodle-size: 1350px;
+$brand-doodle-opacity: 0.35; // body pattern — কম = হালকা, বেশি = গাঢ়
+$brand-footer-doodle-opacity: 0.38; // বেশি = pattern বেশি দেখা যায়
+$brand-footer-dark-overlay: rgba($brand-brown-dark, 0.58); // কম = brown কম, doodle বেশি (0.5–0.75)
+
+$category-color-one: #B3B3B3;
+$category-color: $brand-brown-text;
+$button-color: $brand-yellow;
+$button-color-white: #FFFFFF;
+$button-color1: #b4b3b3;
+$color-header-font: $brand-yellow;
+$color-compare: $brand-yellow;
+$color-gift: #30D194;
+$youtube-color: #FF0000;
+$facebook-color: #468CFF;
+$instagram-color: #E43D66;
+$twiter-color: #45D7FF;
+$color-primary: $brand-yellow;
+$color-on-primary: $brand-brown-text;
+$color-nav: $brand-brown-dark;
+$color-nav-hover: $brand-yellow;
+$color-see-more: $brand-brown;
+$color-see-hover: $brand-yellow-hover;
+$color-black: #333;
+$color-black2: $brand-brown-text;
+$color-black3: #555;
+
+$color-light-gray: #777777;
+$heading-color: $brand-brown-text;
+$sub-heading-color: #565765;
+$color-danger: #ff3838;
+$color-danger-two: #f81d1d;
+$color-border: #e8e8e8;
+
+$color-white: #fff;
+$primary-color: $brand-brown-dark;
+$color-secondary: $brand-brown;
+$color-yellow: $brand-yellow;
+$color-primary-2: $brand-brown;
+$table-bg-color: $brand-yellow;
+$table-text-color: $brand-brown-text;
+$table-sm-color: $brand-yellow-hover;
+$box-shadow-primary: 0px 15px 35px 0px rgba(47, 43, 28, 0.12);
+$color-blue: #0e91c4;
+$color-blue-hover: #097fad;
+$color-deep-red: $brand-brown-text;
+
+
+// my-uses variable:-
+
+$color-primary-2: $brand-brown;
+$color-primary-3: $brand-yellow-light;
+
+$heading-color: $brand-brown-text;
+$input-color: #484848;
+$text-color: #555555;
+$text-color-secondary: #9c9c9c;
+$side-nav-item-color: #484848;
+$footer-item-color: #484848;
+$icon-default-color: $brand-brown-text;
+$color-white: #fff;
+$color-white-secondary: #f1f1f1;
+$btn-single-color: $brand-yellow;
+$z-index: 1;
+$black-color: #000;
+$cart-bg-color: $brand-yellow;
+
+// FONT SIZE
+$font-title-size: 30px;
+$font-title--md-size: 18px;
+$font-dis-size: 16px;

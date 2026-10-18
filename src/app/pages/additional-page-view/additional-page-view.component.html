@@ -1,0 +1,36 @@
+<div class="additional-page">
+  <div class="container">
+    <div class="page-wrapper animated fadeIn">
+      
+      @if (isLoading()) {
+        <div class="loader-container">
+          <mat-spinner diameter="50"></mat-spinner>
+        </div>
+      } @else {
+        @if (pageInfo()) {
+          <article class="content-card">
+            <header class="content-header">
+              <h1>{{ pageInfo()?.title }}</h1>
+              <div class="divider"></div>
+            </header>
+            
+            <div class="content-body" [innerHTML]="pageInfo()?.description | safeHtml"></div>
+
+            @if (showSeoFallback()) {
+              <section class="seo-fallback-content" [innerHTML]="seoFallbackHtml() | safeHtml"></section>
+            }
+
+            <app-seo-internal-links></app-seo-internal-links>
+          </article>
+        } @else {
+          <div class="empty-state">
+            <i class="fa fa-file-circle-exclamation"></i>
+            <h3>পৃষ্ঠাটি শীঘ্রই আসছে!</h3>
+            <p>দুঃখিত, এই মুহূর্তেই এই পৃষ্ঠাটি পাওয়া যাচ্ছে না। অনুগ্রহ করে পরে আবার চেষ্টা করুন।</p>
+          </div>
+        }
+      }
+
+    </div>
+  </div>
+</div>

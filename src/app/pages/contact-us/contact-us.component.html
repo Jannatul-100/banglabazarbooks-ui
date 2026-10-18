@@ -1,0 +1,102 @@
+<div class="contact-page">
+  <div class="container">
+    <div class="contact-wrapper">
+      
+      <!-- Left: Contact Info -->
+      <div class="contact-info-section animated slideInLeft">
+        <div class="info-header">
+          <h1>যোগাযোগ করুন</h1>
+          <p>আপনার যেকোনো জিজ্ঞাসা বা পরামর্শের জন্য আমাদের সাথে যোগাযোগ করুন। আমরা দ্রুত উত্তর দেওয়ার চেষ্টা করবো।</p>
+        </div>
+
+        <div class="info-cards">
+          <div class="info-card">
+            <div class="card-icon"><i class="fa fa-map-marker-alt"></i></div>
+            <div class="card-text">
+              <h3>অফিস ঠিকানা</h3>
+              <p>{{ (shopInfo()?.addresses && shopInfo()?.addresses![0]?.value) }}</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-icon"><i class="fa fa-phone"></i></div>
+            <div class="card-text">
+              <h3>ফোন করুন</h3>
+              <p>{{ (shopInfo()?.phones && shopInfo()?.phones![0]?.value) }}</p>
+              <p *ngIf="shopInfo()?.phones && shopInfo()?.phones![1]">{{ shopInfo()?.phones![1]?.value }}</p>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <div class="card-icon"><i class="fa fa-envelope"></i></div>
+            <div class="card-text">
+              <h3>ইমেইল</h3>
+              <p>{{ (shopInfo()?.emails && shopInfo()?.emails![0]?.value) }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="social-links">
+          @if (shopInfo()?.socialLinks && shopInfo()?.socialLinks!.length > 0) {
+            @if (shopInfo()?.socialLinks![0]) {
+              <a [href]="shopInfo()?.socialLinks![0]?.value" target="_blank" rel="noopener noreferrer" class="social-btn facebook"><i class="fab fa-facebook-f"></i></a>
+            }
+            @if (shopInfo()?.socialLinks![1]) {
+              <a [href]="shopInfo()?.socialLinks![1]?.value" target="_blank" rel="noopener noreferrer" class="social-btn instagram"><i class="fab fa-instagram"></i></a>
+            }
+            @if (shopInfo()?.socialLinks![2]) {
+              <a [href]="shopInfo()?.socialLinks![2]?.value" target="_blank" rel="noopener noreferrer" class="social-btn twitter"><i class="fab fa-twitter"></i></a>
+            }
+            @if (shopInfo()?.socialLinks![3]) {
+              <a [href]="shopInfo()?.socialLinks![3]?.value" target="_blank" rel="noopener noreferrer" class="social-btn youtube"><i class="fab fa-youtube"></i></a>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Right: Contact Form -->
+      <div class="contact-form-section animated slideInRight">
+        <div class="form-card">
+          <form [formGroup]="contactForm" #formDirective="ngForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>আপনার নাম</mat-label>
+                <input matInput formControlName="name" placeholder="নাম লিখুন">
+                <mat-icon matSuffix>person</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>মোবাইল নাম্বার</mat-label>
+                <input matInput formControlName="phoneNo" placeholder="০১৭XXXXXXXX">
+                <mat-icon matSuffix>phone</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>ইমেইল (ঐচ্ছিক)</mat-label>
+                <input matInput formControlName="email" placeholder="email@example.com">
+                <mat-icon matSuffix>email</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>ঠিকানা</mat-label>
+                <input matInput formControlName="address" placeholder="আপনার বর্তমান ঠিকানা">
+                <mat-icon matSuffix>location_on</mat-icon>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>আপনার বার্তা</mat-label>
+                <textarea matInput formControlName="message" rows="5" placeholder="বিস্তারিত লিখুন..."></textarea>
+              </mat-form-field>
+            </div>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="isSubmitting()" class="btn-submit">
+              {{ isSubmitting() ? 'পাঠানো হচ্ছে...' : 'বার্তা পাঠান' }}
+              <i class="fa fa-paper-plane" *ngIf="!isSubmitting()"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

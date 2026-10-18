@@ -1,0 +1,187 @@
+<div class="section">
+    <div class="container">
+        @if (isLoading()) {
+          <div class="loader-container" style="display: flex; justify-content: center; padding: 40px 0;">
+            <div class="spinner" style="border: 4px solid #f3f3f3; border-top: 4px solid #CA2128; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite;"></div>
+          </div>
+        } @else if (order()) {
+          <div class="section-main">
+              <div class="section-left">
+                  <div class="address-area">
+                      <div class="address-title">
+                          <h3>Delivery Address</h3>
+                      </div>
+                      <div class="address-main">
+                          <div class="address-icon">
+                              <img src="/images/icon/rok-icon-delivery-location.svg" alt="">
+                          </div>
+                          <div class="address">
+                              <h3>Home:</h3>
+                              <p>{{order()?.shippingAddress}}</p>
+                              <p>Phone: {{order()?.phoneNo}}</p>
+                          </div>
+                      </div>
+                  </div>
+                  
+                  @if (order()?.packingImage) {
+                    <div class="packing-image-area" style="margin-top: 20px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+                        <div class="address-title" style="margin-bottom: 15px;">
+                            <h3>Packing Verification</h3>
+                        </div>
+                        <div style="text-align: center;">
+                            <img [src]="order()?.packingImage" alt="Packing Image" style="max-width: 100%; border-radius: 8px; border: 1px solid #eee;">
+                            <p style="margin-top: 10px; color: #666; font-size: 14px;">Your order has been packed and is ready for dispatch.</p>
+                        </div>
+                    </div>
+                  }
+              </div>
+
+              <div class="section-right">
+                  <div class="section-right-main">
+                      <div class="date-area">
+                          <div class="date-main">
+                              <div class="date-icon">
+                                  <img src="/images/icon/rok-icon-calendar.png" alt="">
+                              </div>
+                              <div class="date-text">
+                                  <h3>{{ estimatedDeliveryDate() | date }}</h3>
+                                  <p>Estimate Delivery Date</p>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="order-area">
+                          <div class="order-summery-area">
+                                 <div class="order-summery-area-main">
+                                         <div class="order-summery-top" style="display: flex; justify-content: space-between; align-items: center;">
+                                             <h3>Order Summary</h3>
+                                             
+                                             <div class="action-buttons">
+                                               @if (isEditing()) {
+                                                 <button mat-button color="warn" (click)="cancelEdit()" [disabled]="isSaving()">Cancel</button>
+                                                 <button mat-raised-button color="primary" (click)="saveChanges()" [disabled]="isSaving()">
+                                                   @if (isSaving()) {
+                                                     <mat-spinner diameter="20"></mat-spinner>
+                                                   } @else {
+                                                     Save Changes
+                                                   }
+                                                 </button>
+                                               } @else {
+                                                 <button *ngIf="order()?.orderStatus === OrderStatusEnum.PENDING" 
+                                                         mat-stroked-button 
+                                                         color="primary" 
+                                                         (click)="onEditOrder()">
+                                                     <i class="fa fa-pencil" style="margin-right: 5px;"></i> Edit Order
+                                                 </button>
+                                               }
+                                             </div>
+                                        </div>
+
+                                        @if (isEditing()) {
+                                          <div class="edit-add-product-container" style="padding: 15px 20px; background: #fff9f9; border-bottom: 1px solid #eee;">
+                                            <mat-form-field appearance="outline" style="width: 100%;">
+                                              <mat-label>Search book to add...</mat-label>
+                                              <input type="text" matInput [formControl]="productSearchControl" [matAutocomplete]="auto">
+                                              <mat-icon matPrefix>search</mat-icon>
+                                              @if (isSearchingProduct()) {
+                                                <mat-spinner matSuffix diameter="20"></mat-spinner>
+                                              }
+                                            </mat-form-field>
+                                            
+                                            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="onAddProduct($event.option.value)">
+                                              @for (product of searchResults(); track product._id) {
+                                                <mat-option [value]="product" style="height: auto; padding: 10px;">
+                                                  <div style="display: flex; gap: 15px; align-items: center;">
+                                                    <img [src]="product.images?.[0] || '/images/placeholder.jpg'" [alt]="product.name" style="width: 40px; height: 50px; object-fit: cover;">
+                                                    <div>
+                                                      <div style="font-weight: bold; line-height: 1.2;">{{ product.name }}</div>
+                                                      <div style="color: #CA2128; font-size: 13px;">৳ {{ product.salePrice }}</div>
+                                                    </div>
+                                                  </div>
+                                                </mat-option>
+                                              }
+                                            </mat-autocomplete>
+                                          </div>
+                                        }
+
+                                        @for (item of (isEditing() ? editItems() : order()?.orderedItems); track item._id; let idx = $index) {
+                                          <div class="order-information-area">
+                                                <div class="order">
+                                                      <div class="product-area">
+                                                           <div class="product-img">
+                                                                <img [src]="item?.image" [alt]="item?.name">
+                                                           </div>
+                                                           <div class="product-info">
+                                                               <a >{{item?.name}}</a>
+                                                               <p>এই পণ্যটি আপনার অর্ডারে পাঠানো হয়েছে।</p>
+                                                           </div>
+                                                      </div>
+                                                      <div class="price">
+                                                           <h4>Price:<del *ngIf="item?.discountAmount > 0">৳ {{item?.regularPrice  | engBnNum}}</del>৳ {{item?.unitPrice | engBnNum}}</h4>
+                                                      </div>
+                                                      
+                                                      @if (isEditing()) {
+                                                        <div class="quantity" style="display: flex; gap: 10px; align-items: center;">
+                                                          <div style="display: flex; border: 1px solid #ddd; border-radius: 4px;">
+                                                            <button (click)="decrementQty(idx)" [disabled]="item.quantity <= 1" style="border: none; background: #eee; padding: 5px 10px; cursor: pointer;">-</button>
+                                                            <span style="padding: 5px 15px; border-left: 1px solid #ddd; border-right: 1px solid #ddd;">{{item?.quantity}}</span>
+                                                            <button (click)="incrementQty(idx)" style="border: none; background: #eee; padding: 5px 10px; cursor: pointer;">+</button>
+                                                          </div>
+                                                          <button (click)="removeItem(idx)" style="background: none; border: none; color: #CA2128; cursor: pointer;">
+                                                            <i class="fa fa-trash"></i>
+                                                          </button>
+                                                        </div>
+                                                      } @else {
+                                                        <div class="quantity">
+                                                             <h4>Qty: <span>{{item?.quantity}}</span></h4>
+                                                        </div>
+                                                      }
+                                                      
+                                                      <div class="order-total">
+                                                           <h4>৳ {{(item?.unitPrice * item?.quantity) | engBnNum}}</h4>
+                                                      </div>
+                                                </div>
+                                          </div>
+                                        }
+
+                                        <div class="summery-information">
+                                             <div class="summery-info-main">
+                                                   <ul>
+                                                       <li>
+                                                           <span>Total Items:</span>
+                                                           <h4>{{ (isEditing() ? editItems().length : order()?.orderedItems?.length) | engBnNum}} Product(s)</h4>
+                                                       </li>
+                                                       <li>
+                                                           <span>Sub Total:</span>
+                                                           <h4>৳ {{ (isEditing() ? editSubTotal() : (order()?.subTotal || 0)) | engBnNum}}</h4>
+                                                       </li>
+                                                       <li>
+                                                          <span>Delivery charge:</span>
+                                                          <h4>৳ {{ (order()?.deliveryCharge || 0) | engBnNum}}</h4>
+                                                       </li>
+                                                       <li style="padding-top: 10px; border-top: 1px dashed #ddd;">
+                                                          <span style="font-weight: 600;">Payable Amount:</span>
+                                                          <h4 style="font-weight: 600;">৳ {{((order()?.paymentStatus === 'paid' || order()?.paymentStatus === 'Paid' || order()?.paymentType === 'bkash') ? 0 : (isEditing() ? editGrandTotal() : (order()?.grandTotal || 0))) | engBnNum}}</h4>
+                                                       </li>
+                                                   </ul>
+                                             </div>
+                                        </div>
+                                 </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+        } @else {
+          <div style="text-align: center; padding: 40px 0;">
+            <h3>Order not found</h3>
+          </div>
+        }
+    </div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>

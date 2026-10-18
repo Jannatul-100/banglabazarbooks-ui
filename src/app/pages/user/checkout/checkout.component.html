@@ -1,0 +1,266 @@
+<div class="checkout-page">
+  <div class="container">
+    <header class="checkout-page-header">
+      <h1>চেকআউট</h1>
+      <p>অর্ডার সম্পন্ন করতে ঠিকানা ও পেমেন্ট তথ্য দিন</p>
+    </header>
+    <div class="checkout-grid">
+      <!-- Checkout Form -->
+      <form *ngIf="checkoutForm" [formGroup]="checkoutForm" class="checkout-main animated fadeInLeft">
+        <div class="section-card address-card">
+          <div class="card-header border-bottom">
+            <h3>ডেলিভারির ঠিকানা (অনুগ্রহপূর্বক আপনার প্রয়োজনীয় তথ্য দিন)</h3>
+          </div>
+
+          <div class="address-form">
+            <div class="type-selector">
+              <label>পার্সেল গ্রহণ করতে চান যেখান থেকে:</label>
+              <mat-radio-group formControlName="addressType" class="inline-radio">
+                <mat-radio-button value="home">বাসা</mat-radio-button>
+                <mat-radio-button value="office">অফিস</mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <div class="form-grid-2">
+              <input formControlName="name" placeholder="নাম*">
+              <div class="input-group">
+                <input formControlName="phoneNo" placeholder="মোবাইল নম্বর*" maxlength="11">
+                @if (checkoutForm.get('phoneNo')?.touched && checkoutForm.get('phoneNo')?.errors?.['pattern']) {
+                <small class="error-text">সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন</small>
+                }
+              </div>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="select-group">
+                <label>জেলা</label>
+                <app-general-dropdown [inputData]="divisions()" [placeHolderName]="'Select'"
+                  (passDataEvent)="onDivisionSelect($event)" [isRequired]="true">
+                </app-general-dropdown>
+              </div>
+
+              <div class="select-group">
+                <label>এরিয়া/উপজেলা</label>
+                <app-general-dropdown [inputData]="areas()" [placeHolderName]="'Select'"
+                  (passDataEvent)="onAreaSelect($event)" [isRequired]="true">
+                </app-general-dropdown>
+              </div>
+            </div>
+
+            <textarea formControlName="address" rows="3" placeholder="ঠিকানা *"></textarea>
+            <textarea formControlName="note" rows="2" placeholder="নোট (যদি থাকে)"></textarea>
+          </div>
+        </div>
+
+        <!-- Payment & Delivery -->
+        <div class="section-card payment-section">
+          <div class="card-header border-bottom">
+            <h3>কুরিয়ার সার্ভিস (যেকোনো একটি সিলেক্ট করুন)</h3>
+          </div>
+
+          <mat-radio-group formControlName="courier" class="delivery-options mb-3"
+            style="display: flex; gap: 15px; margin-bottom: 20px; padding: 15px;">
+            <mat-radio-button value="standard">স্ট্যান্ডার্ড ডেলিভারি (হোম ডেলিভারি)</mat-radio-button>
+            <mat-radio-button value="sundarban">সুন্দরবন কুরিয়ার (অগ্রিম পেমেন্ট আবশ্যক)</mat-radio-button>
+          </mat-radio-group>
+
+          <div class="card-header border-bottom">
+            <h3>মূল্য পরিশোধ পদ্ধতি (যেকোনো একটি সিলেক্ট করুন)</h3>
+          </div>
+
+          <mat-radio-group formControlName="paymentMethod" class="payment-grid">
+            <mat-radio-button value="cash_on_delivery" class="payment-card"
+              [disabled]="checkoutForm.get('courier')?.value === 'sundarban'">
+              <div class="payment-content">
+                <img src="/images/logo/cod-small.svg" alt="COD" class="payment-icon">
+                <div class="label-group ">
+                  <span class="main-label">Cash on Delivery</span>
+                  <br>
+                  <p class="sub-label">বই হাতে পেয়ে টাকা দিন</p>
+                </div>
+              </div>
+            </mat-radio-button>
+
+            <mat-radio-button value="bkash" class="payment-card">
+              <div class="payment-content">
+                <img src="/bkash.png" alt="COD" class="payment-icon">
+                <div class="label-group horizontal"
+                  style="align-items: center; justify-content: center; width: 100%; gap: 10px;">
+                  <!-- <span class="main-label"
+                    style="color: #e2136e; font-weight: 700; font-size: 1.5rem; line-height: 1;"></span> -->
+                  <!-- <span class="sub-label">বিকাশ পেমেন্ট</span> -->
+                </div>
+              </div>
+            </mat-radio-button>
+
+            <!-- <mat-radio-button value="online_payment" class="payment-card">
+              <div class="payment-content">
+                <span class="main-label">পেমেন্ট করুন</span>
+                <img src="/images/ssl.png" alt="SSL" class="ssl-group-img">
+              </div>
+            </mat-radio-button> -->
+          </mat-radio-group>
+        </div>
+
+        <div class="section-card delivery-charge-section">
+          <div class="card-header border-bottom">
+            <h3>ডেলিভারি চার্জ (যেকোনো একটি সিলেক্ট করুন)</h3>
+          </div>
+
+          @if (checkoutForm.get('courier')?.value === 'sundarban') {
+            <mat-radio-group formControlName="deliveryChargeType" class="delivery-options">
+              <mat-radio-button value="outside_dhaka">সুন্দরবন কুরিয়ার চার্জ (সারা বাংলাদেশ) {{deliveryOutsideDhaka()}} টাকা</mat-radio-button>
+            </mat-radio-group>
+          } @else {
+            <mat-radio-group formControlName="deliveryChargeType" class="delivery-options">
+              <mat-radio-button value="inside_dhaka">ঢাকা সিটির ভেতর হোম ডেলিভারি {{deliveryInDhaka()}} টাকা</mat-radio-button>
+              <mat-radio-button value="outside_dhaka">ঢাকা সিটির বাইরে হোম ডেলিভারি {{deliveryOutsideDhaka()}} টাকা</mat-radio-button>
+            </mat-radio-group>
+          }
+
+          <div class="instructions">
+            <p class="greeting">সম্মানিত গ্রাহক,</p>
+            <ol>
+              @if (checkoutForm.get('courier')?.value === 'sundarban') {
+                <li>সুন্দরবন কুরিয়ারে সারা বাংলাদেশে ডেলিভারির সময়সীমা ২-৫ কর্মদিবস (সম্পূর্ণ পেমেন্ট অগ্রিম আবশ্যক)।</li>
+                <li>ডেলিভারি চার্জ: ১,০০০ টাকা পর্যন্ত ৬০ টাকা, পরবর্তী প্রতি ১,০০০ টাকার জন্য ১৫ টাকা করে অতিরিক্ত যোগ হবে।</li>
+              } @else {
+                <li>স্ট্যান্ডার্ড ডেলিভারিতে ঢাকার মধ্যে ১-৩ কর্মদিবস এবং ঢাকার বাইরে ২-৫ কর্মদিবস।</li>
+                <li>ঢাকা সিটির মধ্যে ডেলিভারি চার্জ ৬০ টাকা (১,০০০ টাকার পর প্রতি ১,০০০ টাকার জন্য ১৫ টাকা অতিরিক্ত)।</li>
+                <li>ঢাকা সিটির বাইরে ডেলিভারি চার্জ ১১০ টাকা (১,০০০ টাকার পর প্রতি ১,০০০ টাকার জন্য ২০ টাকা অতিরিক্ত)।</li>
+                <li>প্রথমবার বা নতুন অর্ডারের ক্ষেত্রে ডেলিভারি চার্জ অগ্রিম প্রযোজ্য হতে পারে (বইয়ের মূল্য ক্যাশ অন)। প্রি-অর্ডারের বই থাকলে সম্পূর্ণ ক্যাশ অন প্রযোজ্য।</li>
+              }
+              <li>বইয়ে কোনো প্রকার ত্রুটি থাকলে তা ৭-১০ কর্মদিবসের মধ্যে বদলানোর সুযোগ থাকবে। ত্রুটি ছাড়া অর্ডার ফেরত বা
+                বদলানোর সুযোগ নেই।</li>
+              <li>আমাদের <a routerLink="/pages/terms-and-conditions">Terms & Conditions</a>, <a
+                  routerLink="/pages/privacy-policy">Privacy Policy</a> ও <a
+                  routerLink="/pages/return-and-refund-policy">Return Refund
+                  Policy</a> পড়ে নিন।</li>
+            </ol>
+
+            <div class="agreement">
+              <mat-checkbox formControlName="agreeTerms" color="primary">
+                উপরের সমস্ত শর্ত মেনে অর্ডার করছি।
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <!-- Sidebar -->
+      <div class="checkout-sidebar animated fadeInRight">
+        <!-- Cart Items -->
+        <div class="sidebar-box">
+          <div class="box-header">ক্রয় তালিকার আইটেম ({{ carts().length }})</div>
+          <div class="item-list">
+            @for (item of carts(); track $index) {
+            <div class="cart-item-row">
+              <img [src]="$any(item.product)?.image || $any(item.product)?.images?.[0] || '/images/placeholder.jpg'"
+                [alt]="$any(item.product)?.name">
+              <div class="item-details">
+                <h6>{{ $any(item.product)?.name }}</h6>
+                @if ($any(item.product)?.author && $any(item.product)?.author?.length) {
+                  <p style="font-size: 12px; color: #777; margin: 2px 0;"><i class="fa fa-pen-nib" style="font-size: 10px; margin-right: 3px;"></i>{{ $any(item.product)?.author[0]?.name || $any(item.product)?.author[0]?.nameEn }}</p>
+                } @else if ($any(item.product)?.author?.name) {
+                  <p style="font-size: 12px; color: #777; margin: 2px 0;"><i class="fa fa-pen-nib" style="font-size: 10px; margin-right: 3px;"></i>{{ $any(item.product)?.author?.name }}</p>
+                }
+                <div class="price-row">
+                  @if (($any(item.product) | price:'discountAmount') > 0) {
+                  <del class="old-price">৳ {{ $any(item.product)?.salePrice }}</del>
+                  <span class="new-price">৳ {{ $any(item.product) | price:'salePrice' }}</span>
+                  } @else {
+                  <span>৳ {{ $any(item.product)?.salePrice }}</span>
+                  }
+                </div>
+                <div class="qty-row">
+                  <div class="qty-btn-group">
+                    <button (click)="decrementQty($index)" [disabled]="(item.selectedQty || 1) <= 1"
+                      aria-label="Decrease quantity">−</button>
+                    <span class="qty-val">{{ item.selectedQty }}</span>
+                    <button (click)="incrementQty($index)" aria-label="Increase quantity">+</button>
+                  </div>
+                  <button class="remove-btn" (click)="removeItem($index)" aria-label="Remove item"><i
+                      class="fa fa-trash"></i></button>
+                </div>
+              </div>
+            </div>
+            }
+          </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="sidebar-box summary-box">
+          <div class="box-header">অর্ডার সারসংক্ষেপ</div>
+          <div class="summary-details">
+            <div class="s-row">
+              <span>বইয়ের মোট মূল্য</span>
+              <span>৳ {{ regularTotal() }}</span>
+            </div>
+            @if (productDiscount() > 0) {
+              <div class="s-row discount-info-row" style="color: #2e7d32; font-size: 13px;">
+                <span>বইয়ের ছাড়</span>
+                <span>- ৳ {{ productDiscount() }}</span>
+              </div>
+            }
+            @if (couponDiscount() > 0) {
+              <div class="s-row coupon-discount-row" style="color: #2e7d32; font-weight: 600;">
+                <span>কুপন ছাড় ({{ appliedCoupon()?.couponCode }})</span>
+                <span>- ৳ {{ couponDiscount() }}</span>
+              </div>
+            }
+            @if (extraDiscount() > 0) {
+              <div class="s-row extra-discount-row">
+                <span>অতিরিক্ত ছাড় (রাউন্ডিং)</span>
+                <span>- ৳ {{ extraDiscount() }}</span>
+              </div>
+            }
+            <div class="s-row">
+              <span>শিপিং চার্জ ({{ checkoutForm.get('courier')?.value === 'sundarban' ? 'সুন্দরবন' : (checkoutForm.get('deliveryChargeType')?.value === 'inside_dhaka' ? 'ঢাকা সিটি' : 'ঢাকার বাইরে') }})</span>
+              <span>৳ {{ shippingCharge() }}</span>
+            </div>
+            <div class="s-row total">
+              <span>সর্বমোট প্রদেয় টাকা</span>
+              <span>৳ {{ grandTotal() }}</span>
+            </div>
+            @if (productDiscount() + couponDiscount() + extraDiscount() > 0) {
+              <div class="save-badge-row" style="margin-top: 10px; padding: 6px 10px; background: #e8f5e9; border-radius: 4px; color: #2e7d32; font-size: 12.5px; text-align: center; font-weight: 600;">
+                🎉 আপনি এই অর্ডারে মোট ৳ {{ productDiscount() + couponDiscount() + extraDiscount() }} সাশ্রয় করছেন!
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Coupon -->
+        <div class="sidebar-box coupon-box">
+          <div class="box-header">প্রোমো কোড বা ভাউচার কোড</div>
+          @if (appliedCoupon()) {
+            <div class="applied-coupon-card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #e8f5e9; border: 1px dashed #4caf50; border-radius: 6px;">
+              <div>
+                <span style="font-weight: 700; color: #2e7d32; font-size: 14px;"><i class="fa fa-ticket" style="margin-right: 5px;"></i>{{ appliedCoupon()?.couponCode }}</span>
+                <span style="display: block; font-size: 12px; color: #555;">৳ {{ couponDiscount() }} ছাড় যুক্ত হয়েছে</span>
+              </div>
+              <button type="button" (click)="removeCoupon()" style="background: none; border: none; color: #d32f2f; cursor: pointer; font-size: 13px; font-weight: 600;">
+                <i class="fa fa-times"></i> বাতিল
+              </button>
+            </div>
+          } @else {
+            <div class="coupon-form">
+              <input type="text" placeholder="আপনার কুপন কোডটি দিন" [ngModel]="couponCode()" (ngModelChange)="couponCode.set($event)"
+                [ngModelOptions]="{standalone: true}">
+              <button type="button" class="btn-apply" (click)="applyCoupon()">অ্যাপ্লাই</button>
+            </div>
+          }
+        </div>
+
+        <button mat-raised-button color="primary" class="btn-confirm-sticky" (click)="onSubmit()"
+          [disabled]="isLoading() || checkoutForm.invalid">
+          @if (isLoading()) {
+          <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+          অর্ডার কনফার্ম করুন
+          }
+        </button>
+      </div> <!-- end sidebar -->
+    </div> <!-- end grid -->
+  </div> <!-- end container -->
+</div> <!-- end page -->

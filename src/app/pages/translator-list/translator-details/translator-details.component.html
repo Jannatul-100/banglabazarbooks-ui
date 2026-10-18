@@ -1,0 +1,131 @@
+<div class="author-details-page translator-details-page">
+  <app-breadcrumb [items]="breadcrumbItems()"></app-breadcrumb>
+  <div class="container">
+    @if (isLoading()) {
+    <div class="loader-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+    } @else {
+    @if (translator()) {
+    <article class="author-profile animated fadeIn">
+      <div class="profile-header">
+        <div class="profile-img">
+          <img [src]="translator()?.image || '/images/avatar/user_low.png'" [alt]="translator()?.name">
+        </div>
+        <div class="profile-info">
+          <h1>
+            {{ translateService.currentLang === 'en' ? (translator()?.nameEn || translator()?.name) : (translator()?.name || translator()?.nameEn) }}
+          </h1>
+          <p class="designation">
+            <i class="fa fa-language"></i>
+            {{ translateService.currentLang === 'en' ? (translator()?.designationEn || translator()?.designation || 'Translator') : (translator()?.designation || translator()?.designationEn || 'অনুবাদক') }}
+          </p>
+          @if (translator()?.birthDate) {
+          <div class="birth-info">
+            <i class="fa fa-calendar-alt"></i> {{ 'ln.Birth' | translate }}: {{ translator()?.birthDate | date: 'dd MMMM, yyyy' }}
+          </div>
+          }
+          @if (translator()?.address || translator()?.addressEn) {
+          <div class="birth-info">
+            <i class="fa fa-map-marker-alt"></i> {{ translateService.currentLang === 'en' ? (translator()?.addressEn || translator()?.address) : (translator()?.address || translator()?.addressEn) }}
+          </div>
+          }
+        </div>
+      </div>
+
+      @if (translatorBioHtml()) {
+      <div class="profile-description">
+        <h2>{{ translateService.currentLang === 'en' ? 'About the Translator' : 'অনুবাদক পরিচিতি' }}</h2>
+        <div class="divider"></div>
+        <div class="bio-content" [innerHTML]="translatorBioHtml() | safeHtml"></div>
+      </div>
+      }
+    </article>
+
+    <div class="author-products">
+      <div class="section-header">
+        <div class="section-header-top">
+          <h2>{{ translateService.currentLang === 'en' ? 'Translated Books' : 'অনুবাদিত বইসমূহ' }}</h2>
+          @if (totalBooks() > 0) {
+          <span class="total-books-counter">
+            <i class="fa fa-book-open"></i> মোট {{ totalBooks() }} টি বই
+          </span>
+          }
+        </div>
+        <div class="divider"></div>
+
+        <div class="author-filter-bar">
+          <div class="filter-item">
+            <label><i class="fa fa-building"></i> প্রকাশনী:</label>
+            <select [ngModel]="selectedPublisher()" (ngModelChange)="selectedPublisher.set($event); onFilterChange()">
+              <option value="">সকল প্রকাশনী</option>
+              @for (pub of publishers(); track pub._id) {
+              <option [value]="pub._id">{{ translateService.currentLang === 'en' ? (pub.nameEn || pub.name) : (pub.name || pub.nameEn) }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label><i class="fa fa-tags"></i> ক্যাটাগরি:</label>
+            <select [ngModel]="selectedCategory()" (ngModelChange)="selectedCategory.set($event); onFilterChange()">
+              <option value="">সকল ক্যাটাগরি</option>
+              @for (cat of categories(); track cat._id) {
+              <option [value]="cat._id">{{ translateService.currentLang === 'en' ? (cat.nameEn || cat.name) : (cat.name || cat.nameEn) }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="filter-item">
+            <label><i class="fa fa-arrow-down-short-wide"></i> সাজান:</label>
+            <select [ngModel]="selectedSort()" (ngModelChange)="selectedSort.set($event); onFilterChange()">
+              <option value="newest">নতুন প্রকাশিত</option>
+              <option value="bestseller">জনপ্রিয় / বেস্ট সেলার</option>
+              <option value="price-low">মূল্য: কম থেকে বেশি</option>
+              <option value="price-high">মূল্য: বেশি থেকে কম</option>
+            </select>
+          </div>
+
+          @if (selectedPublisher() || selectedCategory() || selectedSort() !== 'newest') {
+          <button type="button" class="reset-filter-btn" (click)="onResetFilters()">
+            <i class="fa fa-rotate-left"></i> ফিল্টার রিসেট
+          </button>
+          }
+        </div>
+      </div>
+
+      @if (isLoadingProducts()) {
+      <div class="loader-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+      } @else {
+      <div class="products-grid">
+        @for (product of products(); track product._id) {
+        <app-product-card-one [data]="product"></app-product-card-one>
+        } @empty {
+        <div class="empty-state">
+          <p>{{ translateService.currentLang === 'en' ? 'No translated books found.' : 'এই অনুবাদকের কোনো বই পাওয়া যায়নি।' }}</p>
+        </div>
+        }
+      </div>
+
+      @if (hasMoreProducts()) {
+      <div class="load-more-container">
+        <button class="load-more-btn" (click)="loadMoreProducts()" [disabled]="isLoadingMore()">
+          @if (isLoadingMore()) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            <i class="fa fa-sync-alt"></i> {{ translateService.currentLang === 'en' ? 'Load More' : 'আরো দেখুন' }}
+          }
+        </button>
+      </div>
+      }
+      }
+    </div>
+    }
+    }
+  </div>
+
+  <div class="special-package-section">
+    <app-special-package></app-special-package>
+  </div>
+</div>

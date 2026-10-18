@@ -1,0 +1,77 @@
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>উইশলিস্ট ম্যাচার</h2>
+    <button mat-icon-button mat-dialog-close aria-label="Close dialog">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="mat-typography">
+    <div class="input-section" *ngIf="!hasSearched()">
+      <p class="description">
+        এখানে আপনার পছন্দের বইয়ের তালিকা পেস্ট করুন (প্রতি লাইনে একটি বা কমা দিয়ে)।
+      </p>
+      
+      <mat-form-field appearance="outline" class="w-100">
+        <mat-label>বইয়ের তালিকা</mat-label>
+        <textarea matInput rows="6"
+                  [ngModel]="bookListText()" 
+                  (ngModelChange)="bookListText.set($event)"
+                  placeholder="যেমন:
+হুমায়ূন আহমেদ - মিসির আলি
+পথের পাঁচালী
+গীতাঞ্জলি"></textarea>
+      </mat-form-field>
+
+      <div class="action-btn">
+        <button mat-raised-button color="primary" (click)="onMatchBooks()" [disabled]="isLoading() || !bookListText().trim()">
+          <span *ngIf="!isLoading()">বই খুঁজুন</span>
+          <span *ngIf="isLoading()">খোঁজা হচ্ছে...</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="results-section" *ngIf="hasSearched()">
+      <div class="result-header">
+        <h3>পাওয়া গেছে ({{matchedProducts().length}})</h3>
+        <button mat-button color="accent" (click)="hasSearched.set(false)">আবার খুঁজুন</button>
+      </div>
+
+      <div class="matched-list" *ngIf="matchedProducts().length > 0">
+        <div class="product-item" *ngFor="let product of matchedProducts()">
+          <div class="product-img">
+            <img [src]="product.images && product.images.length ? product.images[0] : '/images/placeholder/test.png'" [alt]="product.name">
+          </div>
+          <div class="product-info">
+            <h4 class="product-name">{{product.name}}</h4>
+            <p class="product-author" *ngIf="product.author && product.author.length">{{product.author[0]?.name}}</p>
+            <div class="product-price">
+              <span class="sale-price">৳{{ product | price: 'salePrice':1 | number: '': translateService.currentLang }}</span>
+              <span class="regular-price" *ngIf="product.discountAmount">
+                <del>৳{{ product.costPrice | number: '': translateService.currentLang }}</del>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="no-matched-msg" *ngIf="matchedProducts().length === 0">
+        <p>দুঃখিত, কোনো বই পাওয়া যায়নি!</p>
+      </div>
+
+      <div class="unmatched-list" *ngIf="unmatchedNames().length > 0">
+        <h4>পাওয়া যায়নি ({{unmatchedNames().length}})</h4>
+        <ul>
+          <li *ngFor="let name of unmatchedNames()">{{name}}</li>
+        </ul>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" *ngIf="hasSearched() && matchedProducts().length > 0">
+    <button mat-button mat-dialog-close>বাতিল</button>
+    <button mat-raised-button color="primary" (click)="addAllToCart()">
+      সবগুলো কার্টে যোগ করুন
+    </button>
+  </mat-dialog-actions>
+</div>

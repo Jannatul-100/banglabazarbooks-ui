@@ -1,0 +1,242 @@
+<div class="header-top">
+  <div class="container">
+    <div class="header-top-main">
+      <div class="header-top-lang">
+        <ul>
+          <li>En</li>
+          <li>
+            <input id="lang-toggle" aria-label="Language Toggle" type="checkbox" [checked]="
+                (isChangeLanguage() && translateService.currentLang === 'bn') ||
+                (isChangeLanguage() && translateService.currentLang === undefined)
+              " (click)="onChangeLanguageToggle('bn')" />
+          </li>
+          <li>বাংলা</li>
+        </ul>
+      </div>
+      <!-- <a class="prapti" routerLink="/find-book-location"
+        aria-label="প্রাপ্তিস্থান - Banglabazar Books বই কোথায় পাওয়া যায়">
+        <span class="prapti-content">
+          <span><img src="/images/brand/icon/praptistan.svg" alt="" aria-hidden="true" /></span>
+          {{ "ln.Praptisthan" | translate }}
+        </span>
+      </a> -->
+
+      <a class="all-notification" routerLink="/account/notification" aria-label="বিজ্ঞপ্তি দেখুন">
+        <span class="notification">
+          <span class="icon"><img src="/images/icon/download.svg" alt="" aria-hidden="true" /></span>
+          @if (notificationsCount() > 0) {
+          <span class="base">{{notificationsCount()}}</span>
+          }
+        </span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<header (outsideClick)="handleOutsideClick()" appOutSideClick>
+  <div class="header-main" [class.header-fixed]="headerFixed()">
+    <div class="container">
+      <div class="header-main-content">
+        <div class="header-left">
+          <button type="button" class="mobile-menu-btn" (click)="onSideNavToggling()" aria-label="মেনু খুলুন">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="logo">
+            <a routerLink="/" aria-label="বাংলা বাজার বুকস Homepage">
+              <img [src]="staticBrandLogo" [alt]="staticBrandLogoAlt" fetchpriority="high" loading="eager" width="220"
+                height="72" />
+            </a>
+          </div>
+        </div>
+
+        <div class="header-middle">
+          <form #searchForm="ngForm" class="header-middle-top" (ngSubmit)="onSearchNavigate()">
+            <div class="search-bar">
+              <input #searchInput id="searchInput" class="tw" type="search" placeholder="পছন্দের বই খুঁজুন..."
+                (focus)="handleFocus($event)" name="searchTerm" aria-label="বই খুঁজুন" autocomplete="off" ngModel />
+            </div>
+            <button type="submit" class="search-icon" aria-label="Search Button">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <button type="button" class="search-icon wishlist-matcher-btn" aria-label="Wishlist Matcher"
+              matTooltip="লিস্ট দিয়ে বই খুঁজুন" (click)="openWishlistMatcher()"
+              style="background-color: var(--color-primary); color: #fff; border-left: 1px solid #fff;">
+              <i class="fa-solid fa-list-check"></i>
+            </button>
+          </form>
+
+          <ul id="auto-suggestion-mobile" class="auto-complete-box"
+            [class.active]="searchProducts().length > 0 && isOpen()">
+            @for (data of searchProducts(); track data._id; let i = $index) {
+            <li class="list-view" (click)="onSelectItem(data, i)" [class.selected]="i === selectedIndex">
+              <div class="search-result-left">
+                <div class="result-product-img">
+                  <img class="img-thumb"
+                    [src]="data.images && data.images.length ? data.images[0] : '/images/placeholder/test.png'"
+                    alt="{{data?.name}}" />
+                </div>
+                <div class="desc">
+                  <p class="search-item-name">{{ data?.name }}</p>
+                  @if (data?.author && data?.author?.length) {
+                  <p class="search-item-author">{{ data?.author[0]?.name }}</p>
+                  } @else if (data?.editor && data?.editor?.length) {
+                  <p class="search-item-author">{{ data?.editor[0]?.name }} (সম্পাদক)</p>
+                  }
+                </div>
+              </div>
+              <div class="price">
+                <h5>{{ currency.bdt }}{{ data | price : "salePrice" : 1 | number : "" : translateService.currentLang }}
+                </h5>
+              </div>
+            </li>
+            }
+          </ul>
+        </div>
+
+        <div class="header-right">
+          <div class="header-right-top">
+            <ul class="header-actions">
+              <li>
+                <a [routerLink]="isUser() ? '/user/account' : '/login'" rel="nofollow"
+                  [attr.aria-label]="isUser() ? ('ln.Myaccount' | translate) : ('ln.Login' | translate)">
+                  @if (isUser() && user()?.profileImg) {
+                  <img class="profile" [src]="user()?.profileImg" alt="User Profile Image" />
+                  } @else {
+                  <i class="fa-regular fa-user"></i>
+                  }
+                </a>
+              </li>
+
+              <li class="menu-cart">
+                <a routerLink="/account/wishlist" [attr.aria-label]="'ln.WishList' | translate">
+                  <i class="fa-regular fa-heart"></i>
+                </a>
+                @if (wishlists().length > 0) {
+                <span class="action-badge wishlist-badge">{{ wishlists().length }}</span>
+                }
+              </li>
+
+              <li class="menu-cart">
+                <a href="#" (click)="$event.preventDefault(); onCartSideToggling()" aria-label="View Shopping Cart">
+                  <i class="fa-solid fa-cart-shopping"></i>
+                </a>
+                @if (cartBadgeCount() > 0) {
+                <span class="action-badge cart-badge">{{ cartBadgeCount() }}</span>
+                }
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="header-middle-bottom nav" [class.nav-fixed]="showMegaMenu()">
+    <div class="container">
+      <ul>
+        <li>
+          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ "ln.Home1" |
+            translate }}</a>
+        </li>
+        <li>
+          <a routerLink="/product-list" routerLinkActive="active">{{ "ln.AllBooks" | translate }}</a>
+        </li>
+        <li class="nav-item dropdown-trigger" routerLinkActive="active">
+          <a class="nav-link" routerLink="/publisher-list">{{ "ln.Publications" | translate }}</a>
+        </li>
+        <li class="nav-item dropdown-trigger" routerLinkActive="active">
+          <a class="nav-link" routerLink="/author-list">{{ "ln.Writer" | translate }}</a>
+        </li>
+        <li>
+          <a routerLink="/special-package" routerLinkActive="active">{{ "ln.SpecialPackage" | translate }}</a>
+        </li>
+        <li>
+          <a routerLink="/offers" routerLinkActive="active">{{ "ln.Offer" | translate }}</a>
+        </li>
+
+        <!-- <li class="nav-item dropdown-trigger" routerLinkActive="active">
+          <a class="nav-link" routerLink="/author-list">{{ "ln.Writer" | translate }} <i
+              class="fa-solid fa-angle-down"></i></a>
+          @if (!isLoadingAuthor() && authors && authors.length) {
+          <div class="dropdown-menu">
+            <ul>
+              @for (data of authors.slice(0, 28); track data._id; let i = $index) {
+              <li>
+                <a [routerLink]="['/author', data.slug]">{{ data.name }}</a>
+              </li>
+              }
+              <li>
+                <a class="see-more" routerLink="/author-list">{{ "ln.SeeMore" | translate }}</a>
+              </li>
+            </ul>
+          </div>
+          }
+        </li> -->
+
+        <!-- <li class="nav-item dropdown-trigger" routerLinkActive="active">
+          <a class="nav-link" routerLink="/publisher-list">{{ "ln.Publications" | translate }} <i
+              class="fa-solid fa-angle-down"></i></a>
+          @if (!isLoadingPublisher() && publications && publications.length) {
+          <div class="dropdown-menu">
+            <ul>
+              @for (data of publications.slice(0, 28); track data._id) {
+              <li>
+                <a [routerLink]="['/product-list']" [queryParams]="{ publisher: data.slug, publisherId: data._id }">{{
+                  data.name }}</a>
+              </li>
+              }
+              <li>
+                <a class="see-more" routerLink="/publisher-list">{{ "ln.SeeMore" | translate }}</a>
+              </li>
+            </ul>
+          </div>
+          }
+        </li> -->
+        <li>
+          <a routerLink="/blogs" routerLinkActive="active">{{ "ln.Blog" | translate }}</a>
+        </li>
+        <!-- <li routerLinkActive="active">
+          <a routerLink="/manuscript-submission">{{ "ln.Manuscript" | translate }}</a>
+        </li> -->
+        <!-- <!-- <li routerLinkActive="active">
+          <a [routerLink]="['/activities']">{{ "ln.Activities" | translate }}</a>
+        </li> -->
+        <li routerLinkActive="active">
+          <a [routerLink]="['/pages/বাংলাবাজার বুকস-পরিচিতি']">{{ "ln.AboutUs" | translate }}</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+@if (!isCheckoutPage()) {
+<div class="bottom-nav">
+  <div class="container">
+    <ul>
+      <li routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <i class="fa fa-home"></i>
+        <span>{{ "ln.Home1" | translate }}</span>
+      </li>
+      <li (click)="onShowCategory()">
+        <i class="fa fa-bars"></i>
+        <span>ক্যাটালগ</span>
+      </li>
+      <li (click)="onCartSideToggling()">
+        <i class="fa fa-shopping-bag"></i>
+        <span>{{ "ln.Cart" | translate }}</span>
+        @if (cartBadgeCount() > 0) {
+        <small>{{ cartBadgeCount() }}</small>
+        }
+      </li>
+      <li (click)="onNavigateAccount()">
+        <i class="fa fa-user-circle" style="font-size: 22px"></i>
+        <span>{{ isUser() ? "আমার একাউন্ট" : ("ln.Login" | translate) }}</span>
+      </li>
+    </ul>
+  </div>
+</div>
+}
+
+<app-side-nav #side_nav></app-side-nav>
+<app-cart-slide #cart_slide></app-cart-slide>
+<app-category-slide #category_slide></app-category-slide>

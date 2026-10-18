@@ -1,0 +1,52 @@
+@use 'src/theme/variables' as *;
+
+.breadcrumb-nav {
+  padding: 15px 0;
+  background: transparent;
+  border-bottom: 2px solid $color-primary;
+  margin-bottom: 20px;
+}
+
+.breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.breadcrumb-item {
+  font-size: 14px;
+  color: $text-color;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  a {
+    text-decoration: none;
+    color: $brand-brown;
+    font-weight: 500;
+    transition: color 0.2s linear;
+
+    i {
+      color: $color-primary;
+    }
+
+    &:hover {
+      color: $brand-yellow-hover;
+      text-decoration: underline;
+    }
+  }
+
+  &.active {
+    color: $brand-brown-text;
+    font-weight: 600;
+  }
+}
+
+.separator {
+  color: rgba($brand-brown-text, 0.35);
+  font-size: 12px;
+}

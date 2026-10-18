@@ -1,0 +1,248 @@
+@if (isLoading()) {
+  <div class="lp2-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else if (landingPage(); as page) {
+  <div class="lp2">
+    <!-- Header -->
+    <header class="lp2-header">
+      <div class="lp2-container lp2-header__inner">
+        <div class="lp2-brand">
+          <div class="lp2-brand__icon">
+            <mat-icon>menu_book</mat-icon>
+          </div>
+          <div class="lp2-brand__text">
+            <strong>{{ page.name || 'Banglabazar Books' }}</strong>
+            <span>{{ page.brandTagline || 'Learn. Grow. Succeed.' }}</span>
+          </div>
+        </div>
+        <div class="lp2-header__badges">
+          @for (badge of headerBadges(); track $index) {
+            <span class="lp2-header__badge">
+              <span class="lp2-header__badge-icon">
+                <mat-icon>check</mat-icon>
+              </span>
+              {{ badge }}
+            </span>
+          }
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="lp2-hero">
+      <div class="lp2-hero__decor" aria-hidden="true">
+        <svg viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 80 Q180 20 320 60" stroke="#93c5fd" stroke-width="2" stroke-dasharray="8 6" fill="none"/>
+          <path d="M80 200 Q200 140 350 180" stroke="#bfdbfe" stroke-width="2" stroke-dasharray="8 6" fill="none"/>
+          <path d="M300 40 L340 70 L310 90 Z" fill="#dbeafe" opacity="0.8"/>
+        </svg>
+      </div>
+
+      <div class="lp2-container lp2-hero__grid">
+        <div class="lp2-hero__content">
+          @if (page.badgeText) {
+            <span class="lp2-pill">
+              <mat-icon>card_giftcard</mat-icon>
+              {{ page.badgeText }}
+            </span>
+          }
+
+          <h1 class="lp2-hero__title">
+            @if (page.title) {
+              <span class="lp2-hero__title-main">{{ page.title }}</span>
+            }
+            @if (page.titleHighlight) {
+              <span class="lp2-hero__title-highlight">{{ page.titleHighlight }}</span>
+            }
+          </h1>
+
+          @if (page.subtitle) {
+            <p class="lp2-hero__subtitle">{{ page.subtitle }}</p>
+          }
+
+          <ul class="lp2-hero__points">
+            @for (point of heroPoints(); track $index) {
+              <li>
+                <span class="lp2-check">
+                  <mat-icon>check</mat-icon>
+                </span>
+                <span>{{ point }}</span>
+              </li>
+            }
+          </ul>
+
+          @if (page.resourceCardTitle || page.resourceCardSubtitle) {
+            <div class="lp2-resource-card">
+              <div class="lp2-resource-card__icon">
+                <mat-icon>description</mat-icon>
+              </div>
+              <div>
+                @if (page.resourceCardTitle) {
+                  <strong>{{ page.resourceCardTitle }}</strong>
+                }
+                @if (page.resourceCardSubtitle) {
+                  <p>{{ page.resourceCardSubtitle }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="lp2-hero__media">
+          <div class="lp2-hero__stage">
+            <div class="lp2-hero__pedestal"></div>
+            <div class="lp2-hero__book">
+              @if (page.heroImage) {
+                <img [src]="page.heroImage" [alt]="page.title || page.name" loading="eager">
+              } @else {
+                <div class="lp2-hero__placeholder">
+                  <mat-icon>menu_book</mat-icon>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lead form + Benefits band -->
+    <section class="lp2-content-band">
+      <div class="lp2-container">
+        <div class="lp2-form-section__grid">
+          <div class="lp2-form-section__info">
+            @if (page.leadFormTitle) {
+              <h2 class="lp2-form-heading">{{ page.leadFormTitle }}</h2>
+            } @else {
+              <h2 class="lp2-form-heading">
+                <span class="lp2-form-heading__accent">ফ্রি ডাউনলোড</span>
+                করতে নিচের তথ্যগুলো দিন
+              </h2>
+            }
+            <p class="lp2-form-subtitle">
+              {{ page.leadFormSubtitle || 'তথ্য দেওয়ার সাথে সাথেই আপনি ডাউনলোড বাটনে ক্লিক করতে পারবেন।' }}
+            </p>
+
+            <div class="lp2-trust-list">
+              @for (item of leadTrustItems(); track $index) {
+                <div class="lp2-trust-list__item">
+                  <div [class]="trustToneClass($index)">
+                    <mat-icon>{{ trustIcon(item) }}</mat-icon>
+                  </div>
+                  <div>
+                    @if (item.title) {
+                      <strong>{{ item.title }}</strong>
+                    }
+                    @if (item.subtitle) {
+                      <p>{{ item.subtitle }}</p>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="lp2-form-card">
+            <form [formGroup]="leadForm" (ngSubmit)="onSubmitLead()">
+              <label class="lp2-field">
+                <span>আপনার নাম</span>
+                <div class="lp2-field__input">
+                  <mat-icon>person_outline</mat-icon>
+                  <input type="text" formControlName="name" placeholder="আপনার পূর্ণ নাম লিখুন">
+                </div>
+              </label>
+
+              <label class="lp2-field">
+                <span>হোয়াটসঅ্যাপ নম্বর</span>
+                <div class="lp2-field__input">
+                  <svg class="lp2-wa-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  <input type="tel" formControlName="phoneNo" placeholder="017XXXXXXXX অথবা +88017XXXXXXXX">
+                </div>
+              </label>
+
+              <label class="lp2-field">
+                <span>Gmail (ইমেইল)</span>
+                <div class="lp2-field__input">
+                  <mat-icon>mail_outline</mat-icon>
+                  <input type="email" formControlName="email" placeholder="youremail@gmail.com">
+                </div>
+              </label>
+
+              <p class="lp2-form-note">
+                <mat-icon>check_circle</mat-icon>
+                {{ page.leadFormNote || 'সব তথ্য পূরণ করলে ডাউনলোড বাটন সক্রিয় হবে' }}
+              </p>
+
+              <button
+                type="submit"
+                class="lp2-btn lp2-btn--primary"
+                [disabled]="!isFormValid() || isSubmitting()"
+              >
+                @if (isSubmitting()) {
+                  <mat-spinner diameter="22"></mat-spinner>
+                } @else {
+                  <mat-icon>download</mat-icon>
+                }
+                {{ page.leadFormButtonText || 'ডাউনলোড করুন' }}
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="lp2-benefits__wrap">
+          <h2 class="lp2-section-title">
+            {{ page.benefitsTitle || 'এই চেকলিস্টে যা যা পাবেন' }}
+          </h2>
+
+          <div class="lp2-benefits__grid">
+            @for (card of benefitCards(); track $index) {
+              <article class="lp2-benefit-card">
+                <div class="lp2-benefit-card__icon" [class]="'lp2-benefit-card__icon--' + ($index % 4)">
+                  <mat-icon>{{ benefitIcon(card) }}</mat-icon>
+                </div>
+                @if (card.title) {
+                  <h3>{{ card.title }}</h3>
+                }
+                @if (card.description) {
+                  <p>{{ card.description }}</p>
+                }
+              </article>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    @if (page.description || page.featuresContent) {
+      <section class="lp2-extra">
+        <div class="lp2-container lp2-extra__grid">
+          @if (page.description) {
+            <div class="lp2-extra__block" [innerHTML]="page.description | safeHtml"></div>
+          }
+          @if (page.featuresContent) {
+            <div class="lp2-extra__block" [innerHTML]="page.featuresContent | safeHtml"></div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Footer -->
+    <footer class="lp2-footer">
+      <div class="lp2-container">
+        <div class="lp2-footer__stats">
+          @for (stat of footerStats(); track $index) {
+            <div class="lp2-footer__stat">
+              <mat-icon>{{ trustIcon({ icon: stat.icon }) }}</mat-icon>
+              <span>{{ stat.text }}</span>
+            </div>
+          }
+        </div>
+        <p class="lp2-footer__copy">
+          © {{ currentYear }} {{ page.name || 'Banglabazar Books' }}. All rights reserved.
+        </p>
+      </div>
+    </footer>
+  </div>
+}

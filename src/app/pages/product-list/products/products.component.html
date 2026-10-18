@@ -1,0 +1,32 @@
+<div class="product-list-data-right">
+  @if (products().length > 0) {
+    <div class="all-product-item-cards">
+      @for (data of products(); track data._id) {
+        <app-product-card-one [data]="data"></app-product-card-one>
+      }
+    </div>
+  } @else if (!isLoading()) {
+    <div class="empty-products-state animated fadeIn">
+      <div class="empty-icon">
+        <i class="fa fa-book-open"></i>
+      </div>
+      <h3>কোনো বই পাওয়া যায়নি</h3>
+      <p>আপনার ফিল্টার পরিবর্তন করে পুনরায় চেষ্টা করুন অথবা অন্য কোনো লেখক বা ক্যাটাগরি অনুসন্ধান করুন।</p>
+    </div>
+  }
+
+  @if (totalProducts() > products().length) {
+    <div class="load-more">
+      <button 
+        type="button" 
+        (click)="onLoadMore()" 
+        class="button" 
+        [class.loading]="isLoadMore()"
+        [disabled]="isLoadMore()"
+      >
+        <i class="fa-solid fa-spinner" [class.fa-spin]="isLoadMore()"></i>
+        <span>{{ "ln.SeeMore" | translate }}</span>
+      </button>
+    </div>
+  }
+</div>

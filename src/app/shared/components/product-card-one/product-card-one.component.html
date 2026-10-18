@@ -1,0 +1,106 @@
+<div class="card">
+  @if ((data()?.discountAmount || 0) > 0 || (data()?.offerDiscountAmount || 0) > 0) {
+  <div class="discount-seal" [class.discount-seal--with-tag]="data()?.isTag"
+    [class.discount-seal--wide]="(data()! | price : 'discountPercentage') >= 10">
+    <img class="discount-seal__bg" src="/wafi_discount_badge_1-01.svg" alt="" aria-hidden="true" width="44"
+      height="44" />
+    <div class="discount-seal__label">
+      <div class="discount-seal__pct">
+        <span class="discount-seal__num">{{ (data()! | price : "discountPercentage") }}</span><span
+          class="discount-seal__sym">%</span>
+      </div>
+      <span class="discount-seal__off">OFF</span>
+    </div>
+  </div>
+  }
+
+  @if (data()?.isTag) {
+  <div class="tag">
+    <img [src]="data()?.tagImage" [alt]="data()?.name + ' tag'">
+  </div>
+  }
+
+  <div class="card-image">
+    <a [routerLink]="['/product-details', data()?.slug]">
+      <img [src]="data()?.images && data()?.images?.length ? data()?.images![0] : '/images/placeholder/test.png'"
+        [alt]="data()?.name" loading="lazy" width="200" height="280">
+    </a>
+
+    <!-- <button class="wishlist-btn" (click)="onAddToWishList($event)" [class.active]="isProductInWishlist()"
+      aria-label="Add to Wishlist">
+      <mat-icon>{{ isProductInWishlist() ? 'favorite' : 'favorite_border' }}</mat-icon>
+    </button> -->
+
+    @if (data()?.isPreOrder) {
+    <span class="badge badge--pre-order">প্রি-অর্ডার</span>
+    }
+    @if (data()?.freeDelivery) {
+    <span class="badge badge--delivery">ফ্রি ডেলিভারি</span>
+    }
+  </div>
+
+  <a class="title" [routerLink]="['/product-details', data()?.slug]">
+    @if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+    <h3>{{ data()?.name }}</h3>
+    } @else {
+    <h3 class="english-font">{{ data()?.nameEn || data()?.name }}</h3>
+    }
+  </a>
+  <div class="card-info">
+    @if (data()?.author && data()?.author?.length) {
+    <div class="writer">
+      @if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+      <a [routerLink]="['/author', data()?.author?.[0]?.slug]">{{ data()?.author?.[0]?.name }}</a>
+      } @else {
+      <a [routerLink]="['/author', data()?.author?.[0]?.slug]" class="english-font">
+        {{ data()?.author?.[0]?.nameEn || data()?.author?.[0]?.name }}
+      </a>
+      }
+    </div>
+    } @else if (data()?.translator && data()?.translator?.length) {
+    <div class="writer">
+      @if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+      <a [routerLink]="['/translator', data()?.translator?.[0]?.slug]">{{ data()?.translator?.[0]?.name }} (অনুবাদক)</a>
+      } @else {
+      <a [routerLink]="['/translator', data()?.translator?.[0]?.slug]" class="english-font">
+        {{ data()?.translator?.[0]?.nameEn || data()?.translator?.[0]?.name }} (Translator)
+      </a>
+      }
+    </div>
+    } @else {
+    <div class="writer writer--empty" aria-hidden="true">&nbsp;</div>
+    }
+
+
+
+    <div class="card-bottom">
+      <div class="price-block">
+        @if ((data()?.discountAmount || 0) > 0 || (data()?.offerDiscountAmount || 0) > 0) {
+        <del class="old-price">
+          @if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+          ৳{{ data()?.salePrice }}
+          } @else {
+          <span class="english-font">Tk{{ data()?.salePrice }}</span>
+          }
+        </del>
+        }
+        @if (data()) {
+        <p class="new-price" [class.english-font]="translateService.currentLang === 'en'">
+          @if (translateService.currentLang === 'bn' || !translateService.currentLang) {
+          ৳{{ (data()! | price : "salePrice") }}
+          } @else {
+          Tk{{ (data()! | price : "salePrice") }}
+          }
+        </p>
+        }
+      </div>
+
+      @if (!cart()) {
+      <button class="btn-cart" (click)="onAddToCart($event)" aria-label="Add to Cart">
+        <mat-icon>add_shopping_cart</mat-icon>
+        <span>{{ data()?.isPreOrder ? "প্রি-অর্ডার" : "যোগ করুন" }}</span>
+      </button>
+      }
+    </div>
+  </div>
+</div>

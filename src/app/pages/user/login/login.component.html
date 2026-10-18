@@ -1,0 +1,77 @@
+<section class="login-page">
+  <div class="container">
+    <h1 class="sr-only">লগইন করুন - Banglabazar Books</h1>
+
+    <div class="login-card">
+      <div class="login-card__accent"></div>
+
+      <div class="login-card__header">
+        <a routerLink="/" class="login-card__logo" aria-label="বাংলাবাজার বুকস হোমপেজ">
+          <img src="/images/logo/banglabazar-books-logo.png" alt="বাংলাবাজার বুকস" width="180" height="58" />
+        </a>
+        <h2>স্বাগতম!</h2>
+        <p>আপনার একাউন্টে লগইন করুন</p>
+      </div>
+
+      <!-- <div class="login-card__social">
+        <button type="button" class="google-btn" #googleLoginRef>
+          <span class="google-btn__icon"><i class="fab fa-google"></i></span>
+          <span>জিমেইল দিয়ে চালান</span>
+        </button>
+      </div>
+
+      <div class="login-card__divider">
+        <span>অথবা</span>
+      </div> -->
+
+      <form class="login-form" #formElement="ngForm" [formGroup]="dataForm" (ngSubmit)="onSubmit()">
+        <div class="form-field">
+          <label for="login-username">মোবাইল নাম্বার</label>
+          <div class="input-wrap">
+            <i class="fa fa-phone input-icon" aria-hidden="true"></i>
+            <input id="login-username" type="text" placeholder="আপনার মোবাইল নাম্বার দিন" formControlName="username"
+              [class.invalid]="username?.touched && username?.invalid" autocomplete="tel" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="login-password">পাসওয়ার্ড</label>
+          <div class="input-wrap">
+            <i class="fa fa-lock input-icon" aria-hidden="true"></i>
+            <input id="login-password" type="password" placeholder="পাসওয়ার্ড দিন" formControlName="password"
+              [class.invalid]="password?.touched && password?.invalid"
+              [attr.type]="isPasswordShow ? 'text' : 'password'" autocomplete="current-password" />
+            <button type="button" class="toggle-password" (click)="onShowPassword()" aria-label="পাসওয়ার্ড দেখুন">
+              <i [class]="isPasswordShow ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+            </button>
+          </div>
+          @if (password?.touched && password?.invalid) {
+          <p class="field-error">কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন</p>
+          }
+        </div>
+
+        <label class="remember-me" for="save-password">
+          <input id="save-password" type="checkbox" />
+          <span>পাসওয়ার্ড সেভ রাখুন</span>
+        </label>
+
+        <button type="submit" class="submit-btn" [disabled]="isLoading">
+          @if (isLoading) {
+          <mat-spinner diameter="20"></mat-spinner>
+          }
+          {{ isLoading ? 'লগইন হচ্ছে...' : 'লগইন করুন' }}
+        </button>
+
+        <p class="forgot-link">
+          পাসওয়ার্ড ভুলে গেছেন?
+          <a routerLink="/forget-password">নবায়ন করুন</a>
+        </p>
+      </form>
+
+      <div class="login-card__footer">
+        <p>বাংলাবাজার বুকসে আপনার একাউন্ট নেই?</p>
+        <a routerLink="/registration" class="register-btn">একাউন্ট খুলুন</a>
+      </div>
+    </div>
+  </div>
+</section>

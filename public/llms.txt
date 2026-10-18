@@ -1,0 +1,25 @@
+# Banglabazar Books (banglabazarbooks.com)
+
+> Banglabazar Books is a leading publisher in Bangladesh specializing in Islamic, academic, and literature books.
+
+## About
+- Website: https://www.banglabazarbooks.com
+- Contact: https://www.banglabazarbooks.com/contact-us
+- About: https://www.banglabazarbooks.com/pages/about-us
+
+## Key sections
+- Books catalog: https://www.banglabazarbooks.com/product-list
+- Authors: https://www.banglabazarbooks.com/author-list
+- Categories: https://www.banglabazarbooks.com/category-list
+- Blog: https://www.banglabazarbooks.com/blogs
+- Activities: https://www.banglabazarbooks.com/activities
+- Special packages: https://www.banglabazarbooks.com/special-package
+
+## Policies
+- Delivery policy: https://www.banglabazarbooks.com/pages/delivery-policy
+- Return & refund: https://www.banglabazarbooks.com/pages/return-and-refund-policy
+- Terms & conditions: https://www.banglabazarbooks.com/pages/terms-and-conditions
+- How to order: https://www.banglabazarbooks.com/pages/how-to-order-website
+
+## Sitemap
+https://www.banglabazarbooks.com/sitemap.xml

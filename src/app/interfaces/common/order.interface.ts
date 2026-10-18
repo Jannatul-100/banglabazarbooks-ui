@@ -1,0 +1,76 @@
+export interface Order {
+  _id?: string;
+  orderId?: string;
+  discountTypes?: DiscountType[];
+  name?: string;
+  phoneNo?: string;
+  email?: string;
+  city?: string;
+  division?: any;
+  area?: any;
+  zone?: any;
+  shippingAddress?: string;
+  paymentType?: string;
+  orderedItems?: OrderedItem[] | any;
+  subTotal?: number;
+  deliveryCharge?: number;
+  discount?: number;
+  totalSave?: number;
+  grandTotal?: number;
+  checkoutDate?: string;
+  courierLink?: string;
+  deliveryDate?: any;
+  orderStatus?: number;
+  note?: string;
+  courierData?: any;
+  paymentStatus?: string;
+  hasOrderTimeline?: boolean;
+  processingDate?: Date;
+  shippingDate?: Date;
+  deliveringDate?: Date;
+  user?: string;
+  coupon?: string;
+  couponDiscount?: number;
+  orderTimeline?: OrderTimeline;
+  processedBy?: any;
+  packingImage?: string;
+  packingPhotoUrl?: string;
+  createdAt?: string;
+  updatedAt?: Date;
+  select?: boolean;
+}
+
+export interface OrderedItem {
+  _id: string;
+  name: string;
+  slug: string;
+  image: string;
+  category: any;
+  author?:any;
+  subCategory: any;
+  brand: any;
+  regularPrice: number;
+  unitPrice: number;
+  quantity: number;
+  orderType: string;
+}
+
+export interface OrderTimeline {
+  confirmed?: OrderTimelineType;
+  processed?: OrderTimelineType;
+  shipped?: OrderTimelineType;
+  delivered?: OrderTimelineType;
+  canceled?: OrderTimelineType;
+  refunded?: OrderTimelineType;
+}
+
+export interface DiscountType {
+  type: string;
+  amount: number;
+}
+
+export interface OrderTimelineType {
+  success: boolean;
+  date?: Date;
+  expectedDate?: Date;
+}

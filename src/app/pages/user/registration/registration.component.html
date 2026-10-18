@@ -1,0 +1,120 @@
+<section class="auth-page">
+  <div class="container">
+    <h1 class="sr-only">রেজিস্ট্রেশন করুন - Banglabazar Books</h1>
+
+    <div class="auth-card">
+      <div class="auth-card__accent"></div>
+
+      <div class="auth-card__header">
+        <a routerLink="/" class="auth-card__logo" aria-label="বাংলাবাজার বুকস হোমপেজ">
+          <img src="/images/logo/banglabazar-books-logo.png" alt="বাংলাবাজার বুকস" width="180" height="58" />
+        </a>
+        <h2>নতুন একাউন্ট খুলুন</h2>
+        <p>বাংলাবাজার বুকসে যোগ দিন</p>
+      </div>
+
+      <!-- <div class="auth-card__social">
+        <button type="button" class="google-btn" #googleLoginRef>
+          <span class="google-btn__icon"><i class="fab fa-google"></i></span>
+          <span>জিমেইল দিয়ে চালান</span>
+        </button>
+      </div>
+
+      <div class="auth-card__divider">
+        <span>অথবা</span>
+      </div> -->
+
+      <form class="auth-form" [formGroup]="dataForm" autocomplete="off">
+        <div class="form-field">
+          <label for="reg-name">আপনার নাম</label>
+          <div class="input-wrap">
+            <i class="fa fa-user input-icon" aria-hidden="true"></i>
+            <input
+              id="reg-name"
+              type="text"
+              placeholder="আপনার নাম লিখুন"
+              formControlName="name"
+              [class.invalid]="name?.touched && name?.invalid"
+              autocomplete="name"
+            />
+          </div>
+          @if (name?.touched && name?.invalid) {
+          <p class="field-error">নাম প্রয়োজন</p>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="reg-username">মোবাইল / ইমেইল</label>
+          <div class="input-wrap">
+            <i class="fa fa-phone input-icon" aria-hidden="true"></i>
+            <input
+              id="reg-username"
+              type="text"
+              placeholder="মোবাইল নাম্বার বা ইমেইল দিন"
+              formControlName="username"
+              [class.invalid]="username?.touched && username?.invalid"
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label for="reg-password">পাসওয়ার্ড</label>
+          <div class="input-wrap">
+            <i class="fa fa-lock input-icon" aria-hidden="true"></i>
+            <input
+              id="reg-password"
+              type="password"
+              placeholder="পাসওয়ার্ড দিন"
+              formControlName="password"
+              [class.invalid]="password?.touched && password?.invalid"
+              [attr.type]="isPasswordShow ? 'text' : 'password'"
+              autocomplete="new-password"
+            />
+            <button type="button" class="toggle-password" (click)="onShowPassword()" aria-label="পাসওয়ার্ড দেখুন">
+              <i [class]="isPasswordShow ? 'fa fa-eye-slash' : 'fa fa-eye'"></i>
+            </button>
+          </div>
+          @if (password?.touched && password?.invalid) {
+          <p class="field-error">কমপক্ষে ৬ অক্ষরের পাসওয়ার্ড দিন</p>
+          }
+        </div>
+
+        @if (isOtpSent) {
+        <div class="form-field">
+          <label for="reg-otp">OTP কোড</label>
+          <div class="input-wrap input-wrap--otp">
+            <i class="fa fa-key input-icon" aria-hidden="true"></i>
+            <input
+              id="reg-otp"
+              type="text"
+              placeholder="কোডটি লিখুন"
+              formControlName="otp"
+              autocomplete="one-time-code"
+            />
+            @if (countdown > 0) {
+            <span class="otp-timer">0:{{ countdown < 10 ? '0' + countdown : countdown }}</span>
+            } @else {
+            <button type="button" class="otp-resend" (click)="onSendOtp()">পুনরায় পাঠান</button>
+            }
+          </div>
+        </div>
+        }
+
+        <label class="terms-check" for="reg-terms">
+          <input id="reg-terms" type="checkbox" formControlName="isAccept" />
+          <span>আমি সকল শর্তাবলী ও নীতিমালা মেনে নিচ্ছি</span>
+        </label>
+
+        <button type="button" class="submit-btn" (click)="onSubmit()" [disabled]="isLoading">
+          {{ isLoading ? 'প্রক্রিয়াধীন...' : (isOtpSent ? 'একাউন্ট খুলুন' : 'OTP পাঠান') }}
+        </button>
+      </form>
+
+      <div class="auth-card__footer">
+        <p>ইতিমধ্যে একাউন্ট আছে?</p>
+        <a routerLink="/login" class="outline-btn">লগইন করুন</a>
+      </div>
+    </div>
+  </div>
+</section>

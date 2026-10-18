@@ -1,0 +1,97 @@
+@use "src/theme/variables" as *;
+
+.kids-book {
+  box-sizing: border-box;
+  margin-bottom: 40px;
+}
+
+.kids-book-contents {
+  position: relative;
+  background: rgba($color-white, 0.92);
+  padding: 16px 16px 24px;
+  border-radius: 14px;
+  border: 1px solid rgba($brand-yellow, 0.35);
+}
+
+.title-area {
+  display: block;
+  padding-top: 8px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.title-area h1,
+.title-area h2 {
+  font-family: $font-bn-primary;
+  font-size: 24px;
+  font-weight: 800;
+  color: $brand-brown-text;
+  display: block;
+  line-height: 1.35;
+  margin: 0 !important;
+}
+
+.see-more-btn {
+  display: block;
+  position: relative;
+  width: 100%;
+}
+
+.read-more {
+  position: absolute;
+  left: 80%;
+}
+
+.read-more a {
+  color: $color-on-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: $font-bn-primary;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.2s linear;
+  background-color: $color-primary;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  max-width: 140px;
+  width: 100%;
+  bottom: -15px;
+  left: 20px;
+  text-align: center;
+  border-radius: 8px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba($brand-yellow, 0.3);
+
+  i {
+    font-size: 12px;
+    transition: transform 0.2s;
+  }
+
+  &:hover {
+    background: $brand-yellow-hover;
+
+    i {
+      transform: translateX(3px);
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  .title-area h1,
+  .title-area h2 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 540px) {
+  .read-more {
+    left: 67%;
+
+    a {
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+  }
+}

@@ -1,0 +1,46 @@
+<section class="section">
+  <div class="container">
+    <header class="title-area">
+      <div class="title-area-left">
+        <h1>{{ "ln.OurArticles" | translate }}</h1>
+      </div>
+    </header>
+
+    <p class="page-intro">
+      বাংলাবাজার বুকস পাবলিকেশনসের লেখক, পাঠক ও প্রকাশনা সংক্রান্ত নানা বিষয় নিয়ে আমাদের নিবন্ধ ও ব্লগ পোস্টগুলো এখানে পড়ুন।
+      ইসলামী সাহিত্য, শিক্ষা, দাওয়াহ, পরিবার ও সামাজিক বিষয়ে লেখা আর্টিকেলগুলো নিয়মিত আপডেট করা হয়।
+      নতুন প্রকাশিত বই, লেখক সাক্ষাৎ, বইমেলা ও পাঠক অভিজ্ঞতা সংক্রান্ত লেখা পেতে এই পৃষ্ঠাটি বুকমার্ক করুন।
+      প্রতিটি ব্লগ থেকে সংশ্লিষ্ট বই, লেখক ও ক্যাটাগরিতে সরাসরি যাওয়ার লিংক পাওয়া যায়।
+      আমাদের <a routerLink="/product-list">প্রকাশিত বই</a>, <a routerLink="/author-list">লেখক তালিকা</a>,
+      <a routerLink="/activities">কার্যক্রম</a> ও <a routerLink="/category-list">ক্যাটাগরি</a> পেজও দেখুন।
+    </p>
+
+    <app-seo-internal-links></app-seo-internal-links>
+
+    <div class="section-main">
+      @if (isLoading()) {
+        @for (loader of [1,2,3,4,5,6]; track loader) {
+          <div class="blog-skeleton">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line"></div>
+              <div class="skeleton-line short"></div>
+            </div>
+          </div>
+        }
+      } @else {
+        @for (data of blogs(); track data._id) {
+          <div class="blog-item">
+            <app-blog-card-one [data]="data"></app-blog-card-one>
+          </div>
+        }
+      }
+    </div>
+
+    @if (totalBlogs() > pageSize()) {
+      <div class="pagination-container">
+        <!-- Pagination logic here if needed, or simple load more -->
+      </div>
+    }
+  </div>
+</section>

@@ -1,0 +1,23 @@
+export const environment = {
+  production: false,
+  name: 'Guardian',
+  domain: 'www.Banglabazarbooks.com',
+  // apiBaseLink: 'http://localhost:2334',
+  apiBaseLink: 'https://api.banglabazarbooks.com',
+  ftpBaseLink: 'https://api.banglabazarbooks.com',
+  // ftpBaseLink: 'https://api.banglabazarbooks.com',
+  // apiBaseLink: 'http://localhost:2334',
+  // ftpBaseLink: 'http://localhost:2334',
+  sslIpnUrl: 'https://api.Banglabazarbooks.com/api/payment/ssl-ipn',
+  appBaseUrl: '/',
+  userBaseUrl: '/',
+  userProfileUrl: '/account',
+  userLoginUrl: 'login',
+  storageSecret: 'SOFT_2021_IT_1998',
+  adminTokenSecret: 'SOFT_ADMIN_1995_&&_SOJOL_dEv',
+  userTokenSecret: 'SOFT_ADMIN_1996_&&_SOBUR_dEv',
+  apiTokenSecret: 'SOFT_API_1998_&&_SAZIB_dEv',
+  facebookAppId: '2112187715803511',
+  googleClientId: '1093549201539-kdmdf8frnvus6g8umf7sjmgtqqiipfjf.apps.googleusercontent.com',
+  VERSION: 1
+};

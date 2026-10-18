@@ -1,0 +1,104 @@
+<div class="payment-status-page" [ngClass]="status()">
+  <div class="container">
+    <div class="status-card animated zoomIn">
+      
+      <div class="status-icon">
+        @if (status() === 'success') {
+          <div class="icon-circle success-bg">
+            <i class="fa fa-check"></i>
+          </div>
+        } @else if (status() === 'fail') {
+          <div class="icon-circle fail-bg">
+            <i class="fa fa-times"></i>
+          </div>
+        } @else {
+          <div class="icon-circle cancel-bg">
+            <i class="fa fa-exclamation"></i>
+          </div>
+        }
+      </div>
+
+      <div class="status-content">
+        <h1>
+          @if (status() === 'success') {
+            অভিনন্দন!<br>অর্ডার সফল হয়েছে
+          } @else if (status() === 'fail') {
+            দুঃখিত!<br>পেমেন্ট ব্যর্থ হয়েছে
+          } @else {
+            পেমেন্ট<br>বাতিল করা হয়েছে
+          }
+        </h1>
+        
+        @if (status() === 'success') {
+          <p class="subtitle">আপনার পরবর্তী অর্ডারগুলোতে থাকছে বিশেষ উপহার জেতার সুযোগ!</p>
+        } @else if (status() === 'fail') {
+          @if (failMessage()) {
+            <p class="subtitle">{{ failMessage() }}</p>
+          } @else {
+            <p class="subtitle">আপনার পেমেন্ট সম্পন্ন করা সম্ভব হয়নি। অনুগ্রহ করে আপনার কার্ড বা একাউন্টের তথ্য যাচাই করে পুনরায় চেষ্টা করুন।</p>
+          }
+        } @else {
+          <p class="subtitle">আপনি পেমেন্ট প্রক্রিয়াটি বাতিল করেছেন। আপনি চাইলে পুনরায় অর্ডার প্রক্রিয়াটি শুরু করতে পারেন।</p>
+        }
+
+        @if (orderId()) {
+          <div class="order-id-badge">
+            <span>অর্ডার আইডি: <strong>#{{ orderId() }}</strong></span>
+          </div>
+        }
+      </div>
+
+      @if (status() === 'success') {
+        <div class="timeline-container">
+          <div class="progress-bar-bg"></div>
+          <div class="progress-bar-fill" [style.width]="progressWidth"></div>
+          
+          <div class="timeline-steps">
+            @for (step of orderTimeline; track step) {
+              <div class="timeline-step" 
+                   [class.active]="orderCount() >= step" 
+                   [class.is-gift]="step === 3 || step === 7 || step === 10">
+                @if (step === 3 || step === 7 || step === 10) {
+                  <div class="gift-label">গিফট</div>
+                  <div class="step-circle gift-circle">
+                    🎁
+                  </div>
+                } @else {
+                  <div class="step-circle">
+                    @if (orderCount() >= step) {
+                      <i class="fa fa-check"></i>
+                    } @else {
+                      {{ step }}
+                    }
+                  </div>
+                }
+                <div class="step-label">
+                  <span class="step-num">{{ step }}<sup>{{ getOrdinal(step) }}</sup></span>
+                  <span class="step-text">Order</span>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="gift-banner">
+          <div class="gift-banner-icon">🎁</div>
+          <div class="gift-banner-text">
+            <h3>আরও অর্ডার করুন,<br>জিতে নিন সারপ্রাইজ গিফট!</h3>
+            <p><i class="fa fa-gift"></i> ৩য়, ৭ম ও ১০ম অর্ডারে বিশেষ উপহার</p>
+          </div>
+        </div>
+      }
+
+      <div class="action-buttons">
+        <button mat-flat-button class="btn-orders" routerLink="/user/account/order-list">
+          <mat-icon>visibility</mat-icon> অর্ডার দেখুন
+        </button>
+        <button mat-stroked-button class="btn-home" routerLink="/">
+          <mat-icon>home</mat-icon> হোম পেজে ফিরুন
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

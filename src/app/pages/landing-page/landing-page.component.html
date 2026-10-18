@@ -1,0 +1,230 @@
+@if (isLoading()) {
+  <div class="lp-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else if (landingPage(); as page) {
+  <div class="landing-page">
+    <!-- Header -->
+    <header class="lp-header">
+      <div class="lp-container lp-header__inner">
+        <a routerLink="/" class="lp-header__brand">{{ page.name || 'Banglabazar Books' }}</a>
+        <button type="button" class="lp-btn lp-btn--accent" (click)="onOrderNow()">
+          অর্ডার করুন
+        </button>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="lp-hero">
+      <div class="lp-container lp-hero__grid">
+        <div class="lp-hero__content">
+          @if (page.badgeText) {
+            <span class="lp-badge">{{ page.badgeText }}</span>
+          }
+          @if (page.title) {
+            <h1 class="lp-hero__title">{{ page.title }}</h1>
+          }
+          @if (page.subtitle) {
+            <p class="lp-hero__subtitle">{{ page.subtitle }}</p>
+          }
+
+          @if (page.salePrice != null) {
+            <div class="lp-price-row">
+              @if (hasHeroDiscount() && page.originalPrice) {
+                <span class="lp-price lp-price--original">৳{{ page.originalPrice }}</span>
+              }
+              <span class="lp-price lp-price--sale">৳{{ page.salePrice }}</span>
+              @if (heroDiscountLabel()) {
+                <span class="lp-discount-badge">{{ heroDiscountLabel() }}</span>
+              }
+            </div>
+          }
+
+          <div class="lp-hero__actions">
+            <button type="button" class="lp-btn lp-btn--primary" (click)="onOrderNow()">
+              এখনই অর্ডার করুন
+            </button>
+            <button type="button" class="lp-btn lp-btn--outline" (click)="onBuyNow()">
+              এখনই কিনুন
+            </button>
+          </div>
+        </div>
+
+        @if (page.heroImage) {
+          <div class="lp-hero__media">
+            <img [src]="page.heroImage" [alt]="page.title || page.name" loading="eager" width="480" height="640">
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Trust bar -->
+    @if (trustItems().length) {
+      <section class="lp-trust">
+        <div class="lp-container lp-trust__grid">
+          @for (item of trustItems(); track $index) {
+            <div class="lp-trust__item">
+              <div class="lp-trust__icon" aria-hidden="true">
+                @if (isMaterialIcon(item.icon)) {
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                } @else {
+                  <span>{{ item.icon || '✓' }}</span>
+                }
+              </div>
+              <div class="lp-trust__text">
+                @if (item.title) {
+                  <strong>{{ item.title }}</strong>
+                }
+                @if (item.subtitle) {
+                  <p>{{ item.subtitle }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- About -->
+    @if (page.description || page.featuresContent || features().length) {
+      <section class="lp-about">
+        <div class="lp-container lp-about__grid">
+          @if (page.description) {
+            <div class="lp-about__description" [innerHTML]="page.description | safeHtml"></div>
+          }
+          @if (page.featuresContent) {
+            <div class="lp-about__features">
+              @if (page.featuresTitle) {
+                <h2>{{ page.featuresTitle }}</h2>
+              }
+              <div class="lp-about__features-content" [innerHTML]="page.featuresContent | safeHtml"></div>
+            </div>
+          } @else if (features().length) {
+            <div class="lp-about__features">
+              @if (page.featuresTitle) {
+                <h2>{{ page.featuresTitle }}</h2>
+              }
+              <ul>
+                @for (feature of features(); track $index) {
+                  <li>
+                    <mat-icon>check_circle</mat-icon>
+                    <div>
+                      @if (feature.title) {
+                        <strong>{{ feature.title }}</strong>
+                      }
+                      @if (feature.value) {
+                        <span>{{ feature.value }}</span>
+                      }
+                    </div>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Products -->
+    @if (products().length) {
+      <section class="lp-products" #productsSection>
+        <div class="lp-container">
+          <div class="lp-products__header">
+            <h2 class="lp-section-title">
+              {{ page.productSectionTitle || 'আপনার পছন্দের বই বেছে নিন' }}
+            </h2>
+            @if (page.productSectionSubtitle) {
+              <p class="lp-products__subtitle">{{ page.productSectionSubtitle }}</p>
+            }
+          </div>
+
+          <div class="lp-products__list">
+            @for (product of products(); track product._id; let i = $index) {
+              <article
+                class="lp-product-select"
+                [class.lp-product-select--selected]="isProductSelected(product._id)"
+                (click)="toggleProductSelection(product._id)"
+                (keydown.enter)="toggleProductSelection(product._id)"
+                tabindex="0"
+                role="button"
+                [attr.aria-pressed]="isProductSelected(product._id)"
+              >
+                @if (i === 0) {
+                  <span class="lp-product-select__best-offer">🔥 সেরা অফার</span>
+                }
+
+                <label class="lp-product-select__checkbox" (click)="$event.stopPropagation()">
+                  <input
+                    type="checkbox"
+                    [checked]="isProductSelected(product._id)"
+                    (change)="toggleProductSelection(product._id)"
+                  >
+                  <span class="lp-product-select__checkmark"></span>
+                </label>
+
+                <div class="lp-product-select__image">
+                  <img [src]="productImage(product)" [alt]="productTitle(product)" loading="lazy" width="72" height="96">
+                </div>
+
+                <div class="lp-product-select__info">
+                  <h3>{{ productTitle(product) }}</h3>
+                  <div class="lp-product-select__price">
+                    <span class="lp-price lp-price--sale">৳{{ product | price : 'salePrice' }}</span>
+                    @if (hasProductDiscount(product)) {
+                      <span class="lp-price lp-price--original">৳{{ product | price : 'regularPrice' }}</span>
+                      <span class="lp-product-select__discount">{{ product | price : 'discountPercentage' }}% ছাড়</span>
+                    }
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+
+          <div class="lp-products__actions">
+            <button
+              type="button"
+              class="lp-btn lp-btn--primary lp-btn--lg"
+              [disabled]="!selectedCount()"
+              (click)="onOrderSelected()"
+            >
+              নির্বাচিত বই অর্ডার করুন ({{ selectedCount() }})
+            </button>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Inside pages gallery -->
+    @if (insidePages().length) {
+      <section class="lp-gallery">
+        <div class="lp-container">
+          <h2 class="lp-section-title">
+            {{ page.insidePagesTitle || 'বইয়ের ভিতরের কিছু পৃষ্ঠা' }}
+          </h2>
+          <div class="lp-gallery__grid">
+            @for (image of insidePages(); track $index) {
+              <figure class="lp-gallery__item">
+                <img [src]="image" [alt]="(page.title || 'Preview') + ' page ' + ($index + 1)" loading="lazy">
+              </figure>
+            }
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Footer CTA -->
+    <section class="lp-footer-cta">
+      <div class="lp-container lp-footer-cta__inner">
+        <div>
+          <h2>{{ page.title || page.name }}</h2>
+          @if (page.salePrice != null) {
+            <p class="lp-footer-cta__price">মাত্র ৳{{ page.salePrice }}</p>
+          }
+        </div>
+        <button type="button" class="lp-btn lp-btn--accent lp-btn--lg" (click)="onOrderNow()">
+          অর্ডার করুন
+        </button>
+      </div>
+    </section>
+  </div>
+}

@@ -1,0 +1,54 @@
+<div class="publisher-list-page">
+  <div class="container">
+    <div class="page-header">
+      <div class="header-content">
+        <i class="fa fa-building"></i>
+        <h1>{{ "ln.Publications" | translate }}</h1>
+      </div>
+      <p class="header-subtitle">{{ 'ln.PublisherListSubtitle' | translate }}</p>
+    </div>
+
+    <div class="list-page-search">
+      <div class="list-page-search-inner">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <input
+          type="text"
+          name="publisherListSearch"
+          [(ngModel)]="searchInputModel"
+          (ngModelChange)="onSearchModelChange($event)"
+          [placeholder]="'ln.SearchPublisherByName' | translate"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    @if (isLoading()) {
+    <div class="loader-container">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+    } @else {
+    <div class="publisher-grid">
+      @for (publisher of publishers() | paginate: { itemsPerPage: pageSize(), currentPage: currentPage(), totalItems:
+      totalPublishers() }; track publisher._id) {
+      <app-author-card-one [data]="$any(publisher)" linkType="publisher" class="animated fadeIn">
+      </app-author-card-one>
+      } @empty {
+      <div class="empty-state">
+        <i class="fa fa-search"></i>
+        <p>{{ 'ln.NoPublishers' | translate }}</p>
+      </div>
+      }
+    </div>
+
+    @if (totalPublishers() > pageSize()) {
+    <div class="pagination-container">
+      <pagination-controls [responsive]="true" [autoHide]="true" [previousLabel]="'ln.Prev' | translate"
+        [nextLabel]="'ln.Next' | translate" (pageChange)="onPageChange($event)">
+      </pagination-controls>
+    </div>
+    }
+
+    <app-seo-internal-links></app-seo-internal-links>
+    }
+  </div>
+</div>
