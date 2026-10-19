@@ -535,7 +535,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         const user = res.data;
         this.checkoutForm.patchValue({
           name: user.name,
-          phoneNo: user.phoneNo
+          phoneNo: user.phoneNo || (user.username && !user.username.includes('@') ? user.username : '')
         });
       }
     });

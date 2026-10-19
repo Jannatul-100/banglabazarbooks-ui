@@ -91,7 +91,7 @@
       }
 
       <div class="action-buttons">
-        <button mat-flat-button class="btn-orders" routerLink="/user/account/order-list">
+        <button mat-flat-button class="btn-orders" (click)="onViewOrder()">
           <mat-icon>visibility</mat-icon> অর্ডার দেখুন
         </button>
         <button mat-stroked-button class="btn-home" routerLink="/">

@@ -157,6 +157,8 @@ export class RegistrationComponent implements OnInit {
           const user = {
             name: formData.name,
             username: formData.username,
+            phoneNo: !isEmail ? formData.username : undefined,
+            email: isEmail ? formData.username : undefined,
             password: formData.password,
             registrationType: isEmail ? 'email' : 'phone',
             hasAccess: true

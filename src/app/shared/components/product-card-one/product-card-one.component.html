@@ -95,12 +95,16 @@
         }
       </div>
 
-      @if (!cart()) {
-      <button class="btn-cart" (click)="onAddToCart($event)" aria-label="Add to Cart">
-        <mat-icon>add_shopping_cart</mat-icon>
-        <span>{{ data()?.isPreOrder ? "প্রি-অর্ডার" : "যোগ করুন" }}</span>
+      <button
+        class="btn-cart"
+        [class.added]="cart()"
+        [disabled]="!!cart()"
+        (click)="onAddToCart($event)"
+        [attr.aria-label]="cart() ? 'যোগ করা হয়েছে' : (data()?.isPreOrder ? 'প্রি-অর্ডার' : 'যোগ করুন')"
+      >
+        <mat-icon>{{ cart() ? 'shopping_cart' : 'add_shopping_cart' }}</mat-icon>
+        <span>{{ cart() ? "যোগ করা হয়েছে" : (data()?.isPreOrder ? "প্রি-অর্ডার" : "যোগ করুন") }}</span>
       </button>
-      }
     </div>
   </div>
 </div>
