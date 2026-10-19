@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, inject, OnDestroy, OnInit, signal, computed } from '@angular/core';
+import { Component, input, inject, OnDestroy, OnInit, signal, computed, effect } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { TranslateModule, TranslateService } from "@ngx-translate/core";
@@ -62,6 +62,14 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
   // Subscriptions
   private subscriptions: Subscription[] = [];
 
+  constructor() {
+    effect(() => {
+      if (this.data()) {
+        this.syncCartStatus();
+      }
+    });
+  }
+
   ngOnInit(): void {
     const subRoute = this.activatedRoute.queryParamMap.subscribe(() => {
       // Sync logic
@@ -72,6 +80,11 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
       this.syncCartStatus();
     });
     this.subscriptions.push(subCart);
+
+    const subReloadCart = this.reloadService.refreshCart$.subscribe(() => {
+      this.syncCartStatus();
+    });
+    this.subscriptions.push(subReloadCart);
 
     this.syncCartStatus();
 
@@ -102,6 +115,10 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
+    if (this.cart()) {
+      return;
+    }
+
     const prodId = this.data()?._id;
     if (!prodId) return;
 
@@ -114,6 +131,7 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
       this.addToCartDB(data);
     } else {
       this.cartService.addCartItemToLocalStorage(data);
+      this.syncCartStatus();
       this.reloadService.needRefreshCart$(true);
       this.uiService.success('কার্টে যোগ করা হয়েছে।');
     }
@@ -198,6 +216,7 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
   private addToCartDB(data: Cart) {
     const sub = this.cartService.addToCart(data).subscribe({
       next: (res) => {
+        this.cart.set(data);
         this.uiService.success(res?.message || 'কার্টে যোগ করা হয়েছে।');
         this.reloadService.needRefreshCart$(true);
       },
@@ -305,7 +324,13 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
   }
 
   private syncCartStatus() {
-    const carts = this.cartService.cartItems;
+    let carts = this.cartService.cartItems;
+    if ((!carts || !carts.length) && !this.userService.getUserStatus()) {
+      const local = this.cartService.getCartItemFromLocalStorage();
+      if (local && local.length) {
+        carts = local;
+      }
+    }
     const prodId = this.data()?._id;
     const found = carts?.find(f => {
       const prod = f.product;

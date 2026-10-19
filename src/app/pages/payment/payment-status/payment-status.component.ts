@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { TranslateModule } from '@ngx-translate/core';
@@ -23,6 +23,7 @@ export class PaymentStatusComponent implements OnInit {
 
   // Dependencies
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private seoService = inject(SeoService);
   private userService = inject(UserService);
   private orderService = inject(OrderService);
@@ -82,5 +83,13 @@ export class PaymentStatusComponent implements OnInit {
     const s = ["th", "st", "nd", "rd"];
     const v = n % 100;
     return s[(v - 20) % 10] || s[v] || s[0];
+  }
+
+  onViewOrder() {
+    if (this.userService.getUserStatus()) {
+      this.router.navigate(['/user/account/order-list']);
+    } else {
+      this.router.navigate(['/login'], { queryParams: { navigateFrom: '/user/account/order-list' } });
+    }
   }
 }
