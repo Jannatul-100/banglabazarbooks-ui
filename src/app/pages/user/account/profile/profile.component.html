@@ -17,7 +17,7 @@
         </tr>
         <tr class="info-group">
           <td class="label">{{ "ln.Phoneno" | translate }}</td>
-          <td class="value">{{ user()?.phoneNo ? user()?.phoneNo : 'N/A' }}</td>
+          <td class="value">{{ user()?.phoneNo ? user()?.phoneNo : (user()?.username && !user()?.username?.includes('@') ? user()?.username : 'N/A') }}</td>
         </tr>
         <tr class="info-group">
           <td class="label">{{ "ln.Email" | translate }}</td>
