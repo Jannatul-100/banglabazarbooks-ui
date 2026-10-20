@@ -96,6 +96,67 @@
       }
     }
 
+    .slide-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: $color-white;
+      border: 1px solid rgba($brand-brown-dark, 0.18);
+      color: $brand-brown-dark;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 15;
+      padding: 0;
+      transition: all 0.2s ease;
+
+      svg {
+        width: 11px;
+        height: 11px;
+        fill: currentColor;
+      }
+
+      &:hover {
+        background: $brand-yellow;
+        color: $brand-brown-dark;
+        border-color: $brand-yellow;
+        box-shadow: 0 3px 10px rgba($brand-yellow, 0.45);
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      &:active {
+        transform: translateY(-50%) scale(0.92);
+      }
+
+      &.prev-btn {
+        left: -13px;
+      }
+
+      &.next-btn {
+        right: -13px;
+      }
+    }
+
+    .slide-counter {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      z-index: 15;
+      background: rgba(0, 0, 0, 0.55);
+      color: $color-white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(4px);
+    }
+
     img {
       width: 100%;
       position: relative;
@@ -123,6 +184,58 @@
       right: 25px;
       z-index: 2;
       border-radius: 4px;
+    }
+  }
+
+  .product-thumbnails {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+    overflow-x: auto;
+    padding: 4px 2px;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+
+    .thumb-item {
+      width: 52px;
+      height: 68px;
+      border-radius: 5px;
+      border: 2px solid rgba($brand-brown-dark, 0.12);
+      background: $color-white;
+      cursor: pointer;
+      overflow: hidden;
+      flex-shrink: 0;
+      padding: 2px;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 3px;
+        display: block;
+      }
+
+      &:hover {
+        border-color: rgba($brand-yellow, 0.85);
+        transform: translateY(-2px);
+      }
+
+      &.active {
+        border-color: $brand-yellow;
+        box-shadow: 0 3px 10px rgba($brand-yellow, 0.45);
+        transform: scale(1.05);
+      }
     }
   }
 

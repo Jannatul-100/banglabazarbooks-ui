@@ -238,6 +238,46 @@
   }
 }
 
+@media (max-width: 768px) {
+  .title-area {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 20px 0 16px;
+
+    .title-area-left {
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+
+      .title-row {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        width: 100%;
+
+        h1 {
+          font-size: 20px;
+          line-height: 28px;
+          padding: 8px 16px;
+        }
+
+        .total-books-counter {
+          font-size: 11px;
+        }
+      }
+    }
+
+    .product-sort-container {
+      width: 100%;
+      justify-content: center;
+      margin-top: 2px;
+    }
+  }
+}
+
 /* --- product-list-main --- */
 .product-list-main {
   width: 100%;

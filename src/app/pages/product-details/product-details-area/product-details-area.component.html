@@ -8,17 +8,47 @@
           <img src="/images/brand/icon/right_arrow.svg" alt="Right Arrow">
         </div>
         }
-        <div class="product-image-box">
+        <div class="product-image-box"
+             (touchstart)="onTouchStart($event)"
+             (touchend)="onTouchEnd($event)">
           <!-- Discount Badges -->
           @if ((product().discountAmount || 0) > 0 || (product().offerDiscountAmount || 0) > 0) {
           <div class="discount-badge">
             <p>-{{ (product()! | price : "discountPercentage") }}%</p>
           </div>
           }
+
+          <!-- Slider Navigation Arrows -->
+          @if (images().length > 1) {
+          <button type="button" class="slide-nav-btn prev-btn" (click)="prevImage($event)" aria-label="Previous image">
+            <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+          </button>
+          <button type="button" class="slide-nav-btn next-btn" (click)="nextImage($event)" aria-label="Next image">
+            <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          </button>
+          <div class="slide-counter">
+            {{ selectedImageIndex() + 1 }} / {{ images().length }}
+          </div>
+          }
+
           <img [class.img-preview]="hasPreview()" (click)="hasPreview() ? openBookPreview() : null"
-            [src]="product().images && product().images?.length ? product().images?.[0] : '/images/placeholder/test.png'"
+            [src]="currentImage()"
             alt="{{product().name}}" loading="lazy">
         </div>
+
+        <!-- Thumbnails -->
+        @if (images().length > 1) {
+        <div class="product-thumbnails">
+          @for (img of images(); track $index; let i = $index) {
+          <div class="thumb-item" 
+               [class.active]="selectedImageIndex() === i" 
+               (click)="selectImage(i)"
+               [title]="hasPreview() && selectedImageIndex() === i ? ('ln.ReadPage' | translate) : ''">
+            <img [src]="img" alt="{{product().name}} - image {{ i + 1 }}">
+          </div>
+          }
+        </div>
+        }
       </div>
 
       <div class="section-middle">

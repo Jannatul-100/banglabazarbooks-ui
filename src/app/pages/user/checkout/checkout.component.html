@@ -202,6 +202,10 @@
                 <span>- ৳ {{ productDiscount() }}</span>
               </div>
             }
+            <div class="s-row">
+              <span>বইয়ের বিক্রয় মূল্য</span>
+              <span>৳ {{ saleTotal() }}</span>
+            </div>
             @if (couponDiscount() > 0) {
               <div class="s-row coupon-discount-row" style="color: #2e7d32; font-weight: 600;">
                 <span>কুপন ছাড় ({{ appliedCoupon()?.couponCode }})</span>

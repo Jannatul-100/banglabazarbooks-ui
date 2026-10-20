@@ -49,6 +49,27 @@ export class ProductDetailsAreaComponent implements OnInit, OnDestroy {
   wishlists = signal<WishList[]>([]);
   bookPreviewOpen = signal(false);
 
+  selectedImageIndex = signal<number>(0);
+  private touchStartX = 0;
+  private touchEndX = 0;
+
+  images = computed(() => {
+    const imgs = this.product()?.images;
+    if (Array.isArray(imgs) && imgs.length > 0) {
+      return imgs.filter(img => !!img);
+    }
+    return [];
+  });
+
+  currentImage = computed(() => {
+    const imgs = this.images();
+    if (imgs.length > 0) {
+      const idx = this.selectedImageIndex();
+      return imgs[idx] || imgs[0];
+    }
+    return '/images/placeholder/test.png';
+  });
+
   localQuantity = signal<number>(1);
 
   hasPreview = computed(() => {
@@ -92,9 +113,10 @@ export class ProductDetailsAreaComponent implements OnInit, OnDestroy {
   private subscriptions: Subscription[] = [];
 
   constructor() {
-    // Effect to sync cart state whenever input product or global carts change
     effect(() => {
-      // Logic handled by computed signals now
+      // Reset selected image index when product changes
+      this.product();
+      this.selectedImageIndex.set(0);
     });
   }
 
@@ -397,6 +419,51 @@ export class ProductDetailsAreaComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => {
       this.bookPreviewOpen.set(false);
     });
+  }
+
+  prevImage(event?: MouseEvent) {
+    event?.stopPropagation();
+    const len = this.images().length;
+    if (len > 1) {
+      this.selectedImageIndex.update(idx => (idx - 1 + len) % len);
+    }
+  }
+
+  nextImage(event?: MouseEvent) {
+    event?.stopPropagation();
+    const len = this.images().length;
+    if (len > 1) {
+      this.selectedImageIndex.update(idx => (idx + 1) % len);
+    }
+  }
+
+  selectImage(index: number) {
+    if (this.selectedImageIndex() === index && this.hasPreview()) {
+      this.openBookPreview();
+    } else {
+      this.selectedImageIndex.set(index);
+    }
+  }
+
+  onTouchStart(e: TouchEvent) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      this.touchStartX = e.changedTouches[0].screenX;
+    }
+  }
+
+  onTouchEnd(e: TouchEvent) {
+    if (e.changedTouches && e.changedTouches.length > 0) {
+      this.touchEndX = e.changedTouches[0].screenX;
+      const swipeThreshold = 40;
+      const diff = this.touchStartX - this.touchEndX;
+      if (Math.abs(diff) > swipeThreshold) {
+        if (diff > 0) {
+          this.nextImage();
+        } else {
+          this.prevImage();
+        }
+      }
+    }
   }
 
   addToCompareList(event: MouseEvent) {
