@@ -1,5 +1,5 @@
 <div class="card">
-  @if ((data()?.discountAmount || 0) > 0 || (data()?.offerDiscountAmount || 0) > 0) {
+  @if (!isStockOut() && ((data()?.discountAmount || 0) > 0 || (data()?.offerDiscountAmount || 0) > 0)) {
   <div class="discount-seal" [class.discount-seal--with-tag]="data()?.isTag"
     [class.discount-seal--wide]="(data()! | price : 'discountPercentage') >= 10">
     <img class="discount-seal__bg" src="/wafi_discount_badge_1-01.svg" alt="" aria-hidden="true" width="44"
@@ -31,7 +31,9 @@
       <mat-icon>{{ isProductInWishlist() ? 'favorite' : 'favorite_border' }}</mat-icon>
     </button> -->
 
-    @if (data()?.isPreOrder) {
+    @if (isStockOut()) {
+    <span class="badge badge--stock-out">স্টক শেষ</span>
+    } @else if (data()?.isPreOrder) {
     <span class="badge badge--pre-order">প্রি-অর্ডার</span>
     }
     @if (data()?.freeDelivery) {
@@ -98,12 +100,13 @@
       <button
         class="btn-cart"
         [class.added]="cart()"
-        [disabled]="!!cart()"
+        [class.stock-out]="isStockOut()"
+        [disabled]="!!cart() || isStockOut()"
         (click)="onAddToCart($event)"
-        [attr.aria-label]="cart() ? 'যোগ করা হয়েছে' : (data()?.isPreOrder ? 'প্রি-অর্ডার' : 'যোগ করুন')"
+        [attr.aria-label]="isStockOut() ? 'স্টক শেষ' : (cart() ? 'যোগ করা হয়েছে' : (data()?.isPreOrder ? 'প্রি-অর্ডার' : 'যোগ করুন'))"
       >
-        <mat-icon>{{ cart() ? 'shopping_cart' : 'add_shopping_cart' }}</mat-icon>
-        <span>{{ cart() ? "যোগ করা হয়েছে" : (data()?.isPreOrder ? "প্রি-অর্ডার" : "যোগ করুন") }}</span>
+        <mat-icon>{{ isStockOut() ? 'block' : (cart() ? 'shopping_cart' : 'add_shopping_cart') }}</mat-icon>
+        <span>{{ isStockOut() ? "স্টক শেষ" : (cart() ? "যোগ করা হয়েছে" : (data()?.isPreOrder ? "প্রি-অর্ডার" : "যোগ করুন")) }}</span>
       </button>
     </div>
   </div>

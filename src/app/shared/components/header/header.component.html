@@ -108,7 +108,7 @@
               </li>
 
               <li class="menu-cart">
-                <a routerLink="/account/wishlist" [attr.aria-label]="'ln.WishList' | translate">
+                <a routerLink="/user/account/wishlist" [attr.aria-label]="'ln.WishList' | translate">
                   <i class="fa-regular fa-heart"></i>
                 </a>
                 @if (wishlists().length > 0) {
@@ -117,7 +117,7 @@
               </li>
 
               <li class="menu-cart">
-                <a href="#" (click)="$event.preventDefault(); onCartSideToggling()" aria-label="View Shopping Cart">
+                <a routerLink="/cart" aria-label="View Shopping Cart">
                   <i class="fa-solid fa-cart-shopping"></i>
                 </a>
                 @if (cartBadgeCount() > 0) {
@@ -221,7 +221,7 @@
         <i class="fa fa-bars"></i>
         <span>ক্যাটালগ</span>
       </li>
-      <li (click)="onCartSideToggling()">
+      <li routerLink="/cart">
         <i class="fa fa-shopping-bag"></i>
         <span>{{ "ln.Cart" | translate }}</span>
         @if (cartBadgeCount() > 0) {

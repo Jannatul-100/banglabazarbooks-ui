@@ -165,6 +165,13 @@
             </p>
           }
         </div>
+        } @else if (isStockOut()) {
+        <div class="stock-out-notice-box">
+          <h4 class="stock-out-badge-lg">
+            <i class="fa fa-ban"></i> স্টক আউট (Out of Stock)
+          </h4>
+          <p class="stock-out-desc">বর্তমানে এই বইটির কোনো স্টক নেই।</p>
+        </div>
         } @else {
         <div class="stock">
           @if ((product().discountAmount || 0) > 0 || (product().offerDiscountAmount || 0) > 0) {
@@ -183,6 +190,7 @@
         </div>
         }
 
+        @if (!isStockOut()) {
         <div class="product-action-btn">
           <ul class="action-list-compact">
             <li>
@@ -199,6 +207,7 @@
             </li>
           </ul>
         </div>
+        }
 
         <div class="product-other-info">
           <ul>

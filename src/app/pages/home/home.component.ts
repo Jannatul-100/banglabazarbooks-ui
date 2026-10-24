@@ -104,6 +104,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.loadHomeData();
     }
 
+    // this.fetchTags();
+
     if (isBrowserVal) {
       this.schedulePopupFetch();
       this.fetchTags();

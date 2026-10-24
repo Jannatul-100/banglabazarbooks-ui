@@ -486,13 +486,22 @@
     padding: 20px 16px;
 
     .track-search-form {
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
 
       .track-input-wrap {
         width: 100%;
+        min-width: 0;
+
+        input {
+          font-size: 13px;
+          padding: 0 12px;
+        }
       }
 
       .track-search-btn {
+        grid-column: 1 / -1;
         width: 100%;
         justify-content: center;
       }

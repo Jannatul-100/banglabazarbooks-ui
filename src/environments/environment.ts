@@ -3,20 +3,13 @@ export const environment = {
   name: 'Guardian',
   domain: 'www.Banglabazarbooks.com',
 
+  apiBaseLink: 'http://localhost:2334',
+  ftpBaseLink: 'http://localhost:2334',
 
   // apiBaseLink: 'https://api.banglabazarbooks.com',
   // ftpBaseLink: 'https://api.banglabazarbooks.com',
 
-  apiBaseLink: 'http://localhost:2334',
-  ftpBaseLink: 'http://localhost:2334',
 
-  apiBaseLink: 'https://api.banglabazarbooks.com',
-  ftpBaseLink: 'https://api.banglabazarbooks.com',
-
-  // apiBaseLink: 'http://localhost:2334',
-  // ftpBaseLink: 'http://localhost:2334',
-
-  
   sslIpnUrl: 'https://api.Banglabazarbooks.com/api/payment/ssl-ipn',
   appBaseUrl: '/',
   userBaseUrl: '/',

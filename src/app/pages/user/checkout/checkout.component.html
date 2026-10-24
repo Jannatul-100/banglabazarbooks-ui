@@ -2,14 +2,16 @@
   <div class="container">
     <header class="checkout-page-header">
       <h1>চেকআউট</h1>
-      <p>অর্ডার সম্পন্ন করতে ঠিকানা ও পেমেন্ট তথ্য দিন</p>
+      <p>অর্ডার সম্পন্ন করতে প্রয়োজনীয় তথ্য ও ঠিকানা দিন</p>
     </header>
+
     <div class="checkout-grid">
       <!-- Checkout Form -->
       <form *ngIf="checkoutForm" [formGroup]="checkoutForm" class="checkout-main animated fadeInLeft">
+        <!-- 1. Delivery Address Card -->
         <div class="section-card address-card">
           <div class="card-header border-bottom">
-            <h3>ডেলিভারির ঠিকানা (অনুগ্রহপূর্বক আপনার প্রয়োজনীয় তথ্য দিন)</h3>
+            <h3><i class="fa fa-map-marked-alt"></i> ডেলিভারির ঠিকানা</h3>
           </div>
 
           <div class="address-form">
@@ -21,59 +23,200 @@
               </mat-radio-group>
             </div>
 
+            <!-- Name and WhatsApp Number -->
             <div class="form-grid-2">
-              <input formControlName="name" placeholder="নাম*">
               <div class="input-group">
-                <input formControlName="phoneNo" placeholder="মোবাইল নম্বর*" maxlength="11">
-                @if (checkoutForm.get('phoneNo')?.touched && checkoutForm.get('phoneNo')?.errors?.['pattern']) {
-                <small class="error-text">সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন</small>
+                <input formControlName="name" placeholder="আপনার পুরো নাম *" class="custom-input">
+                @if (checkoutForm.get('name')?.touched && checkoutForm.get('name')?.errors?.['required']) {
+                  <small class="error-text">অনুগ্রহ করে আপনার নাম দিন</small>
+                }
+              </div>
+
+              <!-- WhatsApp Number (Strictly Required, 11 digits) -->
+              <div class="input-group">
+                <div class="input-with-icon">
+                  <i class="fab fa-whatsapp wp-icon"></i>
+                  <input
+                    formControlName="phoneNo"
+                    placeholder="হোয়াটসঅ্যাপ নম্বর *"
+                    maxlength="11"
+                    type="tel"
+                    class="custom-input">
+                </div>
+                @if (checkoutForm.get('phoneNo')?.touched) {
+                  @if (checkoutForm.get('phoneNo')?.errors?.['required']) {
+                    <small class="error-text">হোয়াটসঅ্যাপ নম্বর দেওয়া আবশ্যক</small>
+                  } @else if (checkoutForm.get('phoneNo')?.errors?.['pattern']) {
+                    <small class="error-text">সঠিক ১১ ডিজিটের মোবাইল নম্বর দিন (যেমন: 017XXXXXXXX)</small>
+                  }
                 }
               </div>
             </div>
 
+            <!-- Alternative Number & Rokomari City/Area Dropdown -->
             <div class="form-grid-2">
-              <div class="select-group">
-                <label>জেলা</label>
-                <app-general-dropdown [inputData]="divisions()" [placeHolderName]="'Select'"
-                  (passDataEvent)="onDivisionSelect($event)" [isRequired]="true">
-                </app-general-dropdown>
+              <!-- Alternative Phone Number (Optional) -->
+              <div class="input-group">
+                <div class="input-with-icon">
+                  <i class="fa fa-phone alt-phone-icon"></i>
+                  <input
+                    formControlName="alternativePhoneNo"
+                    placeholder="বিকল্প ফোন নম্বর"
+                    maxlength="11"
+                    type="tel"
+                    class="custom-input">
+                </div>
+                @if (checkoutForm.get('alternativePhoneNo')?.touched && checkoutForm.get('alternativePhoneNo')?.errors?.['pattern']) {
+                  <small class="error-text">সঠিক ১১ ডিজিটের বিকল্প নম্বর দিন (যেমন: 018XXXXXXXX)</small>
+                }
               </div>
 
-              <div class="select-group">
-                <label>এরিয়া/উপজেলা</label>
-                <app-general-dropdown [inputData]="areas()" [placeHolderName]="'Select'"
-                  (passDataEvent)="onAreaSelect($event)" [isRequired]="true">
-                </app-general-dropdown>
+              <!-- Rokomari-style City / Area Picker -->
+              <div class="city-area-picker-container" (click)="$event.stopPropagation()">
+                <div
+                  class="picker-trigger"
+                  [class.has-selection]="selectedCityAreaLabel()"
+                  [class.picker-open]="isCityAreaPickerOpen()"
+                  [class.picker-invalid]="checkoutForm.get('area')?.touched && checkoutForm.get('area')?.invalid"
+                  (click)="toggleCityAreaPicker()">
+                  <i class="fa fa-map-marker-alt map-pin"></i>
+                  <span class="picker-label">
+                    {{ selectedCityAreaLabel() || 'Select / City / Area *' }}
+                  </span>
+                  <i class="fa fa-chevron-down arrow" [class.rotated]="isCityAreaPickerOpen()"></i>
+                </div>
+
+                @if (isCityAreaPickerOpen()) {
+                  <div class="picker-dropdown-popover animated fadeIn">
+                    @if (cityAreaStep() === 'city') {
+                      <!-- Step 1: City / Division Select -->
+                      <div class="popover-header">
+                        <span class="header-label"><i class="fa fa-city"></i> শহর বা জেলা নির্বাচন করুন</span>
+                        <div class="picker-search-box">
+                          <i class="fa fa-search"></i>
+                          <input
+                            type="text"
+                            placeholder="শহর বা জেলা খুঁজুন..."
+                            [ngModel]="searchCityQuery()"
+                            (ngModelChange)="searchCityQuery.set($event)"
+                            [ngModelOptions]="{standalone: true}"
+                            (click)="$event.stopPropagation()">
+                          @if (searchCityQuery()) {
+                            <button type="button" class="clear-btn" (click)="searchCityQuery.set('')"><i class="fa fa-times"></i></button>
+                          }
+                        </div>
+                      </div>
+                      <div class="picker-list-scroll">
+                        @for (city of filteredCities(); track city._id) {
+                          <div class="picker-item" (click)="selectCity(city)">
+                            <span class="item-name">{{ city.name }}</span>
+                            @if (city.nameEn) {
+                              <span class="item-name-en">{{ city.nameEn }}</span>
+                            }
+                            <i class="fa fa-angle-right item-arrow"></i>
+                          </div>
+                        }
+                        @if (filteredCities().length === 0) {
+                          <div class="no-result">কোনো শহর বা জেলা পাওয়া যায়নি</div>
+                        }
+                      </div>
+                    } @else {
+                      <!-- Step 2: Area / Thana Select -->
+                      <div class="popover-header">
+                        <button type="button" class="btn-back-step" (click)="backToCityStep()">
+                          <i class="fa fa-arrow-left"></i> শহর পরিবর্তন
+                        </button>
+                        <span class="header-label area-title">
+                          <i class="fa fa-location-arrow"></i> {{ selectedCity()?.name }} এর এরিয়া / থানা
+                        </span>
+                        <div class="picker-search-box">
+                          <i class="fa fa-search"></i>
+                          <input
+                            type="text"
+                            placeholder="এরিয়া বা থানা খুঁজুন..."
+                            [ngModel]="searchAreaQuery()"
+                            (ngModelChange)="searchAreaQuery.set($event)"
+                            [ngModelOptions]="{standalone: true}"
+                            (click)="$event.stopPropagation()">
+                          @if (searchAreaQuery()) {
+                            <button type="button" class="clear-btn" (click)="searchAreaQuery.set('')"><i class="fa fa-times"></i></button>
+                          }
+                        </div>
+                      </div>
+                      <div class="picker-list-scroll">
+                        @for (area of filteredAreasList(); track area._id) {
+                          <div class="picker-item area-item" (click)="selectArea(area)">
+                            <i class="fa fa-check-circle check-icon"></i>
+                            <span class="item-name">{{ area.name }}</span>
+                          </div>
+                        }
+                        @if (filteredAreasList().length === 0) {
+                          <div class="no-result">কোনো এরিয়া পাওয়া যায়নি</div>
+                        }
+                      </div>
+                    }
+                  </div>
+                }
+
+                @if (checkoutForm.get('area')?.touched && checkoutForm.get('area')?.invalid) {
+                  <small class="error-text">অনুগ্রহ করে শহর ও এরিয়া নির্বাচন করুন</small>
+                }
               </div>
             </div>
 
-            <textarea formControlName="address" rows="3" placeholder="ঠিকানা *"></textarea>
-            <textarea formControlName="note" rows="2" placeholder="নোট (যদি থাকে)"></textarea>
+            <!-- Detailed Address -->
+            <div class="input-group">
+              <textarea
+                formControlName="address"
+                rows="3"
+                placeholder="সম্পূর্ণ ঠিকানা (বাসা/রোড/মহল্লা ইত্যাদি) *"
+                class="custom-textarea"></textarea>
+              @if (checkoutForm.get('address')?.touched && checkoutForm.get('address')?.errors?.['required']) {
+                <small class="error-text">অনুগ্রহ করে সম্পূর্ণ ঠিকানা দিন</small>
+              }
+            </div>
+
+            <!-- Optional Note -->
+            <div class="input-group">
+              <textarea
+                formControlName="note"
+                rows="2"
+                placeholder="অর্ডার সংক্রান্ত বিশেষ কোনো নোট (যদি থাকে)"
+                class="custom-textarea"></textarea>
+            </div>
           </div>
         </div>
 
-        <!-- Payment & Delivery -->
+        <!-- 2. Courier Service & Payment Section -->
         <div class="section-card payment-section">
           <div class="card-header border-bottom">
-            <h3>কুরিয়ার সার্ভিস (যেকোনো একটি সিলেক্ট করুন)</h3>
+            <h3><i class="fa fa-truck"></i> কুরিয়ার সার্ভিস (যেকোনো একটি সিলেক্ট করুন)</h3>
           </div>
 
-          <mat-radio-group formControlName="courier" class="delivery-options mb-3"
-            style="display: flex; gap: 15px; margin-bottom: 20px; padding: 15px;">
-            <mat-radio-button value="standard">স্ট্যান্ডার্ড ডেলিভারি (হোম ডেলিভারি)</mat-radio-button>
-            <mat-radio-button value="sundarban">সুন্দরবন কুরিয়ার (অগ্রিম পেমেন্ট আবশ্যক)</mat-radio-button>
+          <mat-radio-group
+            formControlName="courier"
+            class="delivery-options"
+            style="display: flex; gap: 15px; margin: 0; padding: 18px 24px; flex-wrap: wrap;">
+            <mat-radio-button value="standard" color="primary">
+              স্ট্যান্ডার্ড ডেলিভারি (হোম ডেলিভারি)
+            </mat-radio-button>
+            <mat-radio-button value="sundarban" color="primary">
+              সুন্দরবন কুরিয়ার (অগ্রিম পেমেন্ট আবশ্যক)
+            </mat-radio-button>
           </mat-radio-group>
 
           <div class="card-header border-bottom">
-            <h3>মূল্য পরিশোধ পদ্ধতি (যেকোনো একটি সিলেক্ট করুন)</h3>
+            <h3><i class="fa fa-credit-card"></i> মূল্য পরিশোধ পদ্ধতি (যেকোনো একটি সিলেক্ট করুন)</h3>
           </div>
 
           <mat-radio-group formControlName="paymentMethod" class="payment-grid">
-            <mat-radio-button value="cash_on_delivery" class="payment-card"
+            <mat-radio-button
+              value="cash_on_delivery"
+              class="payment-card"
               [disabled]="checkoutForm.get('courier')?.value === 'sundarban'">
               <div class="payment-content">
                 <img src="/images/logo/cod-small.svg" alt="COD" class="payment-icon">
-                <div class="label-group ">
+                <div class="label-group">
                   <span class="main-label">Cash on Delivery</span>
                   <br>
                   <p class="sub-label">বই হাতে পেয়ে টাকা দিন</p>
@@ -83,188 +226,179 @@
 
             <mat-radio-button value="bkash" class="payment-card">
               <div class="payment-content">
-                <img src="/bkash.png" alt="COD" class="payment-icon">
-                <div class="label-group horizontal"
-                  style="align-items: center; justify-content: center; width: 100%; gap: 10px;">
-                  <!-- <span class="main-label"
-                    style="color: #e2136e; font-weight: 700; font-size: 1.5rem; line-height: 1;"></span> -->
-                  <!-- <span class="sub-label">বিকাশ পেমেন্ট</span> -->
+                <img src="/bkash.png" alt="bKash" class="payment-icon">
+                <div class="label-group horizontal" style="align-items: center; justify-content: center; width: 100%; gap: 10px;">
+                  <span class="main-label" style="color: #e2136e; font-weight: 700;">bKash পেমেন্ট</span>
                 </div>
               </div>
             </mat-radio-button>
-
-            <!-- <mat-radio-button value="online_payment" class="payment-card">
-              <div class="payment-content">
-                <span class="main-label">পেমেন্ট করুন</span>
-                <img src="/images/ssl.png" alt="SSL" class="ssl-group-img">
-              </div>
-            </mat-radio-button> -->
           </mat-radio-group>
-        </div>
 
-        <div class="section-card delivery-charge-section">
-          <div class="card-header border-bottom">
-            <h3>ডেলিভারি চার্জ (যেকোনো একটি সিলেক্ট করুন)</h3>
-          </div>
-
-          @if (checkoutForm.get('courier')?.value === 'sundarban') {
-            <mat-radio-group formControlName="deliveryChargeType" class="delivery-options">
-              <mat-radio-button value="outside_dhaka">সুন্দরবন কুরিয়ার চার্জ (সারা বাংলাদেশ) {{deliveryOutsideDhaka()}} টাকা</mat-radio-button>
-            </mat-radio-group>
-          } @else {
-            <mat-radio-group formControlName="deliveryChargeType" class="delivery-options">
-              <mat-radio-button value="inside_dhaka">ঢাকা সিটির ভেতর হোম ডেলিভারি {{deliveryInDhaka()}} টাকা</mat-radio-button>
-              <mat-radio-button value="outside_dhaka">ঢাকা সিটির বাইরে হোম ডেলিভারি {{deliveryOutsideDhaka()}} টাকা</mat-radio-button>
-            </mat-radio-group>
-          }
-
-          <div class="instructions">
-            <p class="greeting">সম্মানিত গ্রাহক,</p>
-            <ol>
-              @if (checkoutForm.get('courier')?.value === 'sundarban') {
-                <li>সুন্দরবন কুরিয়ারে সারা বাংলাদেশে ডেলিভারির সময়সীমা ২-৫ কর্মদিবস (সম্পূর্ণ পেমেন্ট অগ্রিম আবশ্যক)।</li>
-                <li>ডেলিভারি চার্জ: ১,০০০ টাকা পর্যন্ত ৬০ টাকা, পরবর্তী প্রতি ১,০০০ টাকার জন্য ১৫ টাকা করে অতিরিক্ত যোগ হবে।</li>
-              } @else {
-                <li>স্ট্যান্ডার্ড ডেলিভারিতে ঢাকার মধ্যে ১-৩ কর্মদিবস এবং ঢাকার বাইরে ২-৫ কর্মদিবস।</li>
-                <li>ঢাকা সিটির মধ্যে ডেলিভারি চার্জ ৬০ টাকা (১,০০০ টাকার পর প্রতি ১,০০০ টাকার জন্য ১৫ টাকা অতিরিক্ত)।</li>
-                <li>ঢাকা সিটির বাইরে ডেলিভারি চার্জ ১১০ টাকা (১,০০০ টাকার পর প্রতি ১,০০০ টাকার জন্য ২০ টাকা অতিরিক্ত)।</li>
-                <li>প্রথমবার বা নতুন অর্ডারের ক্ষেত্রে ডেলিভারি চার্জ অগ্রিম প্রযোজ্য হতে পারে (বইয়ের মূল্য ক্যাশ অন)। প্রি-অর্ডারের বই থাকলে সম্পূর্ণ ক্যাশ অন প্রযোজ্য।</li>
-              }
-              <li>বইয়ে কোনো প্রকার ত্রুটি থাকলে তা ৭-১০ কর্মদিবসের মধ্যে বদলানোর সুযোগ থাকবে। ত্রুটি ছাড়া অর্ডার ফেরত বা
-                বদলানোর সুযোগ নেই।</li>
-              <li>আমাদের <a routerLink="/pages/terms-and-conditions">Terms & Conditions</a>, <a
-                  routerLink="/pages/privacy-policy">Privacy Policy</a> ও <a
-                  routerLink="/pages/return-and-refund-policy">Return Refund
-                  Policy</a> পড়ে নিন।</li>
-            </ol>
-
-            <div class="agreement">
-              <mat-checkbox formControlName="agreeTerms" color="primary">
-                উপরের সমস্ত শর্ত মেনে অর্ডার করছি।
-              </mat-checkbox>
-            </div>
+          <div class="terms-agreement-box">
+            <mat-checkbox formControlName="agreeTerms" color="primary">
+              <span class="terms-label-text">
+                <span class="terms-part-one">
+                  <strong class="brand-name-highlight">বাংলাবাজার বুকস</strong>-এর <a (click)="openTermsModal($event)" class="terms-link">শর্তাবলীতে</a>
+                </span>
+                <span class="terms-part-two">সম্মতি প্রদান করছি।</span>
+              </span>
+            </mat-checkbox>
+            @if (checkoutForm.get('agreeTerms')?.touched && !checkoutForm.get('agreeTerms')?.value) {
+              <small class="error-text">অর্ডার নিশ্চিত করতে অনুগ্রহ করে শর্তাবলীতে সম্মতি প্রদান করুন</small>
+            }
           </div>
         </div>
       </form>
 
       <!-- Sidebar -->
       <div class="checkout-sidebar animated fadeInRight">
-        <!-- Cart Items -->
-        <div class="sidebar-box">
-          <div class="box-header">ক্রয় তালিকার আইটেম ({{ carts().length }})</div>
-          <div class="item-list">
-            @for (item of carts(); track $index) {
-            <div class="cart-item-row">
-              <img [src]="$any(item.product)?.image || $any(item.product)?.images?.[0] || '/images/placeholder.jpg'"
-                [alt]="$any(item.product)?.name">
-              <div class="item-details">
-                <h6>{{ $any(item.product)?.name }}</h6>
-                @if ($any(item.product)?.author && $any(item.product)?.author?.length) {
-                  <p style="font-size: 12px; color: #777; margin: 2px 0;"><i class="fa fa-pen-nib" style="font-size: 10px; margin-right: 3px;"></i>{{ $any(item.product)?.author[0]?.name || $any(item.product)?.author[0]?.nameEn }}</p>
-                } @else if ($any(item.product)?.author?.name) {
-                  <p style="font-size: 12px; color: #777; margin: 2px 0;"><i class="fa fa-pen-nib" style="font-size: 10px; margin-right: 3px;"></i>{{ $any(item.product)?.author?.name }}</p>
-                }
-                <div class="price-row">
-                  @if (($any(item.product) | price:'discountAmount') > 0) {
-                  <del class="old-price">৳ {{ $any(item.product)?.salePrice }}</del>
-                  <span class="new-price">৳ {{ $any(item.product) | price:'salePrice' }}</span>
-                  } @else {
-                  <span>৳ {{ $any(item.product)?.salePrice }}</span>
-                  }
-                </div>
-                <div class="qty-row">
-                  <div class="qty-btn-group">
-                    <button (click)="decrementQty($index)" [disabled]="(item.selectedQty || 1) <= 1"
-                      aria-label="Decrease quantity">−</button>
-                    <span class="qty-val">{{ item.selectedQty }}</span>
-                    <button (click)="incrementQty($index)" aria-label="Increase quantity">+</button>
-                  </div>
-                  <button class="remove-btn" (click)="removeItem($index)" aria-label="Remove item"><i
-                      class="fa fa-trash"></i></button>
-                </div>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-
-        <!-- Summary -->
+        <!-- Summary Box -->
         <div class="sidebar-box summary-box">
-          <div class="box-header">অর্ডার সারসংক্ষেপ</div>
+          <div class="box-header">
+            <i class="fa fa-receipt"></i>
+            <span>অর্ডার সারসংক্ষেপ</span>
+          </div>
+
           <div class="summary-details">
             <div class="s-row">
-              <span>বইয়ের মোট মূল্য</span>
-              <span>৳ {{ regularTotal() }}</span>
+              <span class="row-label">বইয়ের বিক্রয় মূল্য</span>
+              <span class="row-value">৳{{ saleTotal() | engBnNum }}</span>
             </div>
-            @if (productDiscount() > 0) {
-              <div class="s-row discount-info-row" style="color: #2e7d32; font-size: 13px;">
-                <span>বইয়ের ছাড়</span>
-                <span>- ৳ {{ productDiscount() }}</span>
-              </div>
-            }
+
             <div class="s-row">
-              <span>বইয়ের বিক্রয় মূল্য</span>
-              <span>৳ {{ saleTotal() }}</span>
+              <span class="row-label">
+                ডেলিভারি চার্জ
+                <small class="charge-zone">
+                  ({{ checkoutForm.get('courier')?.value === 'sundarban' ? 'সুন্দরবন' : (checkoutForm.get('deliveryChargeType')?.value === 'inside_dhaka' ? 'ঢাকা সিটি' : 'ঢাকার বাইরে') }})
+                </small>
+              </span>
+              <span class="row-value">৳{{ shippingCharge() | engBnNum }}</span>
             </div>
+
             @if (couponDiscount() > 0) {
-              <div class="s-row coupon-discount-row" style="color: #2e7d32; font-weight: 600;">
-                <span>কুপন ছাড় ({{ appliedCoupon()?.couponCode }})</span>
-                <span>- ৳ {{ couponDiscount() }}</span>
+              <div class="s-row coupon-discount-row">
+                <span class="row-label">কুপন ছাড় ({{ appliedCoupon()?.couponCode }})</span>
+                <span class="row-value">- ৳{{ couponDiscount() | engBnNum }}</span>
               </div>
             }
+
+            <div class="s-row">
+              <span class="row-label">মোট</span>
+              <span class="row-value">৳{{ rawTotal() | engBnNum }}</span>
+            </div>
+
             @if (extraDiscount() > 0) {
               <div class="s-row extra-discount-row">
-                <span>অতিরিক্ত ছাড় (রাউন্ডিং)</span>
-                <span>- ৳ {{ extraDiscount() }}</span>
+                <span class="row-label">রাউন্ডিং ছাড়</span>
+                <span class="row-value">- ৳{{ extraDiscount() | engBnNum }}</span>
               </div>
             }
-            <div class="s-row">
-              <span>শিপিং চার্জ ({{ checkoutForm.get('courier')?.value === 'sundarban' ? 'সুন্দরবন' : (checkoutForm.get('deliveryChargeType')?.value === 'inside_dhaka' ? 'ঢাকা সিটি' : 'ঢাকার বাইরে') }})</span>
-              <span>৳ {{ shippingCharge() }}</span>
-            </div>
+
             <div class="s-row total">
-              <span>সর্বমোট প্রদেয় টাকা</span>
-              <span>৳ {{ grandTotal() }}</span>
+              <span class="row-label">সর্বমোট প্রদেয় টাকা</span>
+              <span class="row-value">৳{{ grandTotal() | engBnNum }}</span>
             </div>
+
             @if (productDiscount() + couponDiscount() + extraDiscount() > 0) {
-              <div class="save-badge-row" style="margin-top: 10px; padding: 6px 10px; background: #e8f5e9; border-radius: 4px; color: #2e7d32; font-size: 12.5px; text-align: center; font-weight: 600;">
-                🎉 আপনি এই অর্ডারে মোট ৳ {{ productDiscount() + couponDiscount() + extraDiscount() }} সাশ্রয় করছেন!
+              <div class="save-badge-row">
+                <span>আপনি এই অর্ডারে মোট ৳{{ (productDiscount() + couponDiscount() + extraDiscount()) | engBnNum }} সাশ্রয় করছেন!</span>
               </div>
             }
           </div>
         </div>
 
-        <!-- Coupon -->
+        <!-- Coupon Box -->
         <div class="sidebar-box coupon-box">
-          <div class="box-header">প্রোমো কোড বা ভাউচার কোড</div>
+          <div class="box-header">
+            <i class="fa fa-ticket-alt"></i>
+            <span>প্রোমো কোড বা ভাউচার কোড</span>
+          </div>
+
           @if (appliedCoupon()) {
-            <div class="applied-coupon-card" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: #e8f5e9; border: 1px dashed #4caf50; border-radius: 6px;">
+            <div class="applied-coupon-card">
               <div>
-                <span style="font-weight: 700; color: #2e7d32; font-size: 14px;"><i class="fa fa-ticket" style="margin-right: 5px;"></i>{{ appliedCoupon()?.couponCode }}</span>
-                <span style="display: block; font-size: 12px; color: #555;">৳ {{ couponDiscount() }} ছাড় যুক্ত হয়েছে</span>
+                <span class="coupon-code-label">
+                  <i class="fa fa-ticket"></i> {{ appliedCoupon()?.couponCode }}
+                </span>
+                <span class="coupon-discount-text">৳{{ couponDiscount() | engBnNum }} ছাড় যুক্ত হয়েছে</span>
               </div>
-              <button type="button" (click)="removeCoupon()" style="background: none; border: none; color: #d32f2f; cursor: pointer; font-size: 13px; font-weight: 600;">
+              <button type="button" class="btn-remove-coupon" (click)="removeCoupon()">
                 <i class="fa fa-times"></i> বাতিল
               </button>
             </div>
           } @else {
             <div class="coupon-form">
-              <input type="text" placeholder="আপনার কুপন কোডটি দিন" [ngModel]="couponCode()" (ngModelChange)="couponCode.set($event)"
+              <input
+                type="text"
+                placeholder="কুপন কোড লিখুন"
+                [ngModel]="couponCode()"
+                (ngModelChange)="couponCode.set($event)"
                 [ngModelOptions]="{standalone: true}">
               <button type="button" class="btn-apply" (click)="applyCoupon()">অ্যাপ্লাই</button>
             </div>
           }
         </div>
 
-        <button mat-raised-button color="primary" class="btn-confirm-sticky" (click)="onSubmit()"
+        <!-- Sticky / Prominent Order Confirm CTA -->
+        <button
+          type="button"
+          class="btn-confirm-order"
+          (click)="onSubmit()"
           [disabled]="isLoading() || checkoutForm.invalid">
           @if (isLoading()) {
-          <mat-spinner diameter="20"></mat-spinner>
+            <mat-spinner diameter="22"></mat-spinner>
+            <span>অর্ডার প্রসেস হচ্ছে...</span>
           } @else {
-          অর্ডার কনফার্ম করুন
+            <span>অর্ডার কনফার্ম করুন</span>
+            <i class="fa fa-arrow-right"></i>
           }
         </button>
       </div> <!-- end sidebar -->
     </div> <!-- end grid -->
   </div> <!-- end container -->
-</div> <!-- end page -->
+
+  <!-- Terms & Conditions Modal (Rokomari Style in Bengali for বাংলাবাজার বুকস) -->
+  @if (showTermsModal()) {
+    <div class="terms-modal-overlay" (click)="closeTermsModal()">
+      <div class="terms-modal-content" (click)="$event.stopPropagation()">
+        <div class="terms-modal-header">
+          <div class="modal-title">
+            <i class="fa fa-file-contract"></i>
+            <h3>শর্তাবলী</h3>
+          </div>
+          <button type="button" class="btn-close-modal" (click)="closeTermsModal()" aria-label="Close modal">
+            <i class="fa fa-times"></i>
+          </button>
+        </div>
+
+        <div class="terms-modal-body">
+          <p class="terms-intro">
+            গ্রাহকদের সর্বোচ্চ সেবা নিশ্চিত করতে <strong>বাংলাবাজার বুকস</strong> সর্বদা সচেষ্ট। তবে অনিবার্য কিছু কারণে স্টকে না থাকা প্রোডাক্টগুলো সাপ্লায়ারের নিকট থেকে সংগ্রহ করতে সাময়িক বিলম্ব হতে পারে।
+          </p>
+
+          <div class="terms-card">
+            <p><strong>১.</strong> আপনার অর্ডারের প্রোডাক্টগুলো সাপ্লায়ারের কাছে না থাকলে অথবা স্টক আউট হলে, সেই প্রোডাক্ট(গুলো) ব্যতীত অবশিষ্ট প্রোডাক্টগুলো পাঠিয়ে দেওয়া হবে। এ বিষয়ে আপনার সাথে ফোন/ইমেইল/এসএমএস/হোয়াটসঅ্যাপ/ফেসবুক মেসেঞ্জারে যোগাযোগ করা হবে।</p>
+          </div>
+
+          <div class="terms-card">
+            <p><strong>২.</strong> আপনার পেইড অর্ডারের প্রোডাক্ট Supplier থেকে সংগ্রহ করা সম্ভব না হলে অথবা অন্য কোনো বিশেষ কারণে ক্যানসেল হলে গেটওয়ের নিয়ম অনুযায়ী নির্দিষ্ট কার্যদিবসের মধ্যে রিফান্ড করা হবে ইনশাআল্লাহ।</p>
+          </div>
+
+          <div class="terms-card">
+            <p><strong>৩.</strong> সাপ্লায়ারের পক্ষ থেকে প্রোডাক্টের মূল্য পরিবর্তন হলে পরিবর্তিত মূল্যের ভিত্তিতে পুনরায় আপনাকে ইমেইল/এসএমএস/হোয়াটসঅ্যাপ/ফেসবুক মেসেঞ্জারে নোটিফাই করে কনফার্ম করা হবে।</p>
+          </div>
+
+          <div class="terms-card">
+            <p><strong>৪.</strong> পণ্যটি ফিজিক্যালি ক্ষতিগ্রস্ত কি না তা ডেলিভারিম্যানের সামনে চেক করে গ্রহণ করুন এবং আনবক্সিং ভিডিও করে রাখুন। পরবর্তীতে কোনো অভিযোগ করার জন্য আনবক্সিং ভিডিও শেয়ার করা বাধ্যতামূলক।</p>
+          </div>
+        </div>
+
+        <div class="terms-modal-footer">
+          <button type="button" class="btn-modal-agree" (click)="acceptTermsAndClose()">
+            <i class="fa fa-check"></i> আমি সম্মত
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

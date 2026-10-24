@@ -1,0 +1,252 @@
+<div class="cart-page">
+  <div class="container">
+    <div class="cart-breadcrumb">
+      <a routerLink="/"><i class="fa fa-home"></i> হোম</a>
+      <span class="sep"><i class="fa fa-angle-right"></i></span>
+      <span class="current">কার্ট</span>
+    </div>
+
+    @if (isLoading()) {
+      <!-- Elegant Skeleton Loading State -->
+      <div class="cart-skeleton-wrapper">
+        <div class="cart-grid">
+          <div class="cart-main-col">
+            <div class="skeleton-box skeleton-header-card"></div>
+            <div class="items-list">
+              <div class="skeleton-box skeleton-item-card"></div>
+              <div class="skeleton-box skeleton-item-card"></div>
+            </div>
+          </div>
+          <div class="cart-sidebar-col">
+            <div class="skeleton-box skeleton-summary-card"></div>
+          </div>
+        </div>
+      </div>
+    } @else if (carts().length === 0) {
+      <!-- Empty Cart State -->
+      <div class="empty-cart-card">
+        <div class="empty-cart-icon-wrap">
+          <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="8" cy="21" r="1"></circle>
+            <circle cx="19" cy="21" r="1"></circle>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path>
+          </svg>
+        </div>
+        <h2>আপনার কার্টটি খালি!</h2>
+        <p class="empty-desc">
+          আপনার কার্টে কোনো বই যুক্ত করা হয়নি। বাংলাবাজার বুকসের বিশাল সংগ্রহ থেকে আপনার পছন্দের বইগুলো এখনই যুক্ত করুন।
+        </p>
+        <a routerLink="/product-list" class="btn-browse-books">
+          <i class="fa fa-book-open"></i> নতুন বই দেখুন
+        </a>
+      </div>
+    } @else {
+      <!-- Cart Main Grid -->
+      <div class="cart-grid">
+        <!-- Left: Cart Items List -->
+        <div class="cart-main-col">
+          <!-- Master Header Bar (Primary Brand Theme in Bengali) -->
+          <div class="master-header-card">
+            <div class="header-left">
+              <mat-checkbox
+                [checked]="isAllSelected()"
+                [indeterminate]="isSomeSelected()"
+                (change)="toggleSelectAll($event.checked)"
+                color="primary"
+                class="master-checkbox">
+                <span class="select-all-label">
+                  সবগুলো নির্বাচন করুন ({{ selectedCount() | engBnNum }}/{{ totalCount() | engBnNum }} টি বই)
+                </span>
+              </mat-checkbox>
+              <button
+                type="button"
+                class="btn-trash-header"
+                (click)="deleteSelectedItems()"
+                [disabled]="selectedCount() === 0"
+                title="নির্বাচিত বইগুলো মুছুন"
+                aria-label="Delete selected items">
+                <i class="fa fa-trash-alt"></i>
+              </button>
+            </div>
+
+            <div class="header-right">
+              <span class="total-caption">আপনার মোট:</span>
+              @if (headerRegularTotal() > headerSaleTotal()) {
+                <del class="mrp-strikethrough">৳{{ headerRegularTotal() | engBnNum }}</del>
+              }
+              <span class="sale-highlight">৳{{ headerSaleTotal() | engBnNum }}</span>
+            </div>
+          </div>
+
+          <!-- Items List -->
+          <div class="items-list">
+            @for (item of carts(); track (item._id || $index); let i = $index) {
+              <div class="cart-item-card" [class.unselected]="!isItemSelected(item)" [class.item-stockout]="isStockOut(item.product)">
+                <!-- Checkbox -->
+                <div class="item-checkbox-wrap">
+                  <mat-checkbox
+                    [checked]="!isStockOut(item.product) && isItemSelected(item)"
+                    [disabled]="isStockOut(item.product)"
+                    (change)="toggleSelectItem(item)"
+                    color="primary"
+                    [aria-label]="'Select ' + $any(item.product)?.name">
+                  </mat-checkbox>
+                </div>
+
+                <!-- Thumbnail -->
+                <div class="item-thumb-wrap" [routerLink]="['/product-details', $any(item.product)?.slug]">
+                  <img
+                    [src]="$any(item.product)?.images?.[0] || $any(item.product)?.image || '/images/placeholder/test.png'"
+                    [alt]="$any(item.product)?.name || 'Book thumbnail'"
+                    loading="lazy">
+                </div>
+
+                <!-- Info & Actions -->
+                <div class="item-info-col">
+                  <h3 class="book-title" [routerLink]="['/product-details', $any(item.product)?.slug]">
+                    {{ $any(item.product)?.name }}
+                  </h3>
+
+                  @if (getProductAuthor(item.product)) {
+                    <p class="author-name">
+                      <i class="fa fa-pen-nib"></i>
+                      <span>{{ getProductAuthor(item.product) }}</span>
+                    </p>
+                  }
+
+                  <!-- Stockout Badge -->
+                  @if (isStockOut(item.product)) {
+                    <div class="stockout-badge-wrap">
+                      <span class="badge-stockout">
+                        <i class="fa fa-times-circle"></i> স্টক শেষ (Stock Out)
+                      </span>
+                    </div>
+                  }
+
+                  <div class="item-action-btns">
+                    <button
+                      type="button"
+                      class="btn-action-icon btn-delete"
+                      (click)="onRemoveItem(item, i)"
+                      title="কার্ট থেকে মুছে ফেলুন"
+                      aria-label="Remove item">
+                      <i class="fa fa-trash-alt"></i>
+                    </button>
+
+                    <!-- Love / Wishlist Icon Button (Without text) -->
+                    <button
+                      type="button"
+                      class="btn-action-icon btn-heart"
+                      [class.wishlisted]="isWishlisted(item)"
+                      (click)="onToggleWishlist(item)"
+                      [title]="isWishlisted(item) ? 'উইশলিস্টে যুক্ত আছে' : 'উইশলিস্টে যুক্ত করুন'"
+                      aria-label="Wishlist">
+                      <i [class]="isWishlisted(item) ? 'fa fa-heart' : 'far fa-heart'"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Quantity Controller -->
+                <div class="item-qty-col">
+                  <div class="qty-stepper" [class.disabled-stepper]="isStockOut(item.product)">
+                    <button
+                      type="button"
+                      class="btn-step btn-minus"
+                      (click)="onDecrementQty(item._id!, i, item.selectedQty || 1)"
+                      [disabled]="(item.selectedQty || 1) <= 1 || isStockOut(item.product)"
+                      aria-label="Decrease quantity">
+                      <i class="fa fa-minus"></i>
+                    </button>
+                    <span class="qty-display">{{ (item.selectedQty || 1) | engBnNum }}</span>
+                    <button
+                      type="button"
+                      class="btn-step btn-plus"
+                      (click)="onIncrementQty(item._id!, i)"
+                      [disabled]="isStockOut(item.product)"
+                      aria-label="Increase quantity">
+                      <i class="fa fa-plus"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Prices -->
+                <div class="item-price-col">
+                  <div class="sale-price">
+                    ৳{{ (getProductSalePrice(item.product) * (item.selectedQty || 1)) | engBnNum }}
+                  </div>
+                  @if (getProductRegularPrice(item.product) > getProductSalePrice(item.product)) {
+                    <del class="regular-mrp">
+                      ৳{{ (getProductRegularPrice(item.product) * (item.selectedQty || 1)) | engBnNum }}
+                    </del>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Right: Checkout Summary Sidebar -->
+        <aside class="cart-sidebar-col">
+          <div class="checkout-summary-card">
+            <!-- Header styled with Primary / Dark Brown Brand Palette -->
+            <div class="summary-header">
+              <h3>অর্ডার সারসংক্ষেপ</h3>
+            </div>
+
+            <div class="summary-body">
+              <div class="summary-row">
+                <span class="row-label">বইয়ের বিক্রয় মূল্য</span>
+                <span class="row-value">৳{{ subTotal() | engBnNum }}</span>
+              </div>
+
+              <div class="summary-row">
+                <span class="row-label">ডেলিভারি চার্জ</span>
+                <span class="row-value">৳{{ shippingCharge() | engBnNum }}</span>
+              </div>
+
+              <div class="summary-row">
+                <span class="row-label">মোট</span>
+                <span class="row-value">৳{{ rawTotal() | engBnNum }}</span>
+              </div>
+
+              @if (extraDiscount() > 0) {
+                <div class="summary-row rounding-row">
+                  <span class="row-label">রাউন্ডিং ছাড়</span>
+                  <span class="row-value">- ৳{{ extraDiscount() | engBnNum }}</span>
+                </div>
+              }
+
+              <div class="summary-row payable-total-row">
+                <span class="row-label">সর্বমোট প্রদেয় টাকা</span>
+                <span class="row-value">৳{{ payableTotal() | engBnNum }}</span>
+              </div>
+
+              <!-- Savings Banner -->
+              @if (totalSavings() > 0) {
+                <div class="savings-banner">
+                  <span>আপনি এই অর্ডারে মোট ৳{{ totalSavings() | engBnNum }} সাশ্রয় করছেন!</span>
+                </div>
+              }
+
+              <!-- Proceed CTA (Primary Yellow styled like user request Image 2) -->
+              <button
+                type="button"
+                class="btn-proceed-checkout"
+                [disabled]="selectedCount() === 0"
+                (click)="onProceedToCheckout()">
+                <span>অর্ডার করতে এগিয়ে যান</span>
+                <i class="fa fa-arrow-right"></i>
+              </button>
+
+              @if (selectedCount() === 0) {
+                <p class="selection-notice">
+                  <i class="fa fa-info-circle"></i> অর্ডার করতে অনুগ্রহ করে অন্তত একটি বই নির্বাচন করুন
+                </p>
+              }
+            </div>
+          </div>
+        </aside>
+      </div>
+    }
+  </div>
+</div>
