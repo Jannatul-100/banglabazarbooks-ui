@@ -611,7 +611,7 @@ export class HeaderComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onCartSideToggling() {
-    if (this.cart_slide) this.cart_slide.cartSlideShowHide();
+    this.router.navigate(['/cart']);
   }
 
   onShowCategory() {

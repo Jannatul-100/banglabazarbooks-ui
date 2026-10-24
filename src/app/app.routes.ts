@@ -83,8 +83,32 @@ export const routes: Routes = [
   },
   {
     path: 'checkout',
-
     loadComponent: () => import('./pages/user/checkout/checkout.component').then(m => m.CheckoutComponent)
+  },
+  {
+    path: 'cart',
+    loadComponent: () => import('./pages/user/cart-2/cart-2.component').then(m => m.Cart2Component)
+  },
+  {
+    path: 'cart-2',
+    redirectTo: 'cart',
+    pathMatch: 'full'
+  },
+  {
+    path: 'wishlist',
+    redirectTo: '/user/account/wishlist',
+    pathMatch: 'full'
+  },
+  {
+    path: 'account',
+    children: [
+      { path: '', redirectTo: '/user/account', pathMatch: 'full' },
+      { path: 'wishlist', redirectTo: '/user/account/wishlist', pathMatch: 'full' },
+      { path: 'profile', redirectTo: '/user/account/profile', pathMatch: 'full' },
+      { path: 'order-list', redirectTo: '/user/account/order-list', pathMatch: 'full' },
+      { path: 'order-details/:orderId', redirectTo: '/user/account/order-details/:orderId', pathMatch: 'full' },
+      { path: 'order-track/:orderId', redirectTo: '/user/account/order-track/:orderId', pathMatch: 'full' }
+    ]
   },
   {
     path: 'complete-registration',
@@ -165,7 +189,12 @@ export const routes: Routes = [
       },
       {
         path: 'cart',
-        loadComponent: () => import('./pages/user/cart/cart-information/cart-information.component').then(m => m.CartInformationComponent)
+        loadComponent: () => import('./pages/user/cart-2/cart-2.component').then(m => m.Cart2Component)
+      },
+      {
+        path: 'cart-2',
+        redirectTo: 'cart',
+        pathMatch: 'full'
       }
     ]
   },

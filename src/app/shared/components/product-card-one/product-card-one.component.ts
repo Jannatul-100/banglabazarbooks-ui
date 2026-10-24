@@ -46,6 +46,16 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
 
   // Computed state
   isProductInWishlist = computed(() => !!this.wishlist());
+  isStockOut = computed(() => {
+    const p = this.data();
+    if (!p) return false;
+    if (p.isPreOrder) return false;
+    if (p.quantity !== undefined && p.quantity !== null && Number(p.quantity) <= 0) return true;
+    if (p.trackQuantity && (p.quantity === undefined || Number(p.quantity) <= 0)) return true;
+    if (p.status === 'stock_out') return true;
+    if (p.status && p.status !== 'publish' && p.status !== 'active') return true;
+    return false;
+  });
 
   // Dependencies
   private readonly cartService = inject(CartService);
@@ -114,6 +124,11 @@ export class ProductCardOneComponent implements OnInit, OnDestroy {
   onAddToCart(event: MouseEvent) {
     event.preventDefault();
     event.stopPropagation();
+
+    if (this.isStockOut()) {
+      this.uiService.wrong('দুঃখিত! এই বইটি বর্তমানে স্টকে নেই।');
+      return;
+    }
 
     if (this.cart()) {
       return;

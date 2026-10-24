@@ -34,16 +34,17 @@ import { GtmService } from '../../../services/core/gtm.service';
 import { OrderStatus } from '../../../enum/order.enum';
 import { Product } from '../../../interfaces/common/product';
 import { PricePipe } from '../../../shared/pipes/price.pipe';
+import { EngBnNumPipe } from '../../../shared/pipes/eng-bn-num.pipe';
 import { UtilsService } from '../../../services/core/utils.service';
 import { SeoService } from '../../../services/core/seo.service';
-
+import { SELECTED_CHECKOUT_ITEMS_KEY } from '../cart-2/cart-2.component';
 
 @Component({
   selector: 'app-checkout',
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.scss'],
   standalone: true,
-  providers: [PricePipe],
+  providers: [PricePipe, EngBnNumPipe],
   imports: [
     CommonModule,
     FormsModule,
@@ -59,7 +60,8 @@ import { SeoService } from '../../../services/core/seo.service';
     MatDividerModule,
     MatProgressSpinnerModule,
     GeneralDropdownComponent,
-    PricePipe
+    PricePipe,
+    EngBnNumPipe
   ]
 })
 export class CheckoutComponent implements OnInit, OnDestroy {
@@ -69,6 +71,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   shippingCharge = signal<number>(0);
   deliveryInDhaka = signal<number>(60);
   deliveryOutsideDhaka = signal<number>(110);
+
+  // Rokomari-style City / Area Selection
+  selectedCityAreaLabel = signal<string>('');
+  isCityAreaPickerOpen = signal<boolean>(false);
+  cityAreaStep = signal<'city' | 'area'>('city');
+  selectedCity = signal<any>(null);
+  searchCityQuery = signal<string>('');
+  searchAreaQuery = signal<string>('');
+
+  // Terms & Conditions Modal
+  showTermsModal = signal<boolean>(false);
 
   // Totals Computed
   regularTotal = computed(() => {
@@ -103,18 +116,35 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   appliedCoupon = signal<any>(null);
   couponDiscount = signal<number>(0);
 
+  rawTotal = computed(() => {
+    return Math.max(0, this.saleTotal() - this.couponDiscount() + this.shippingCharge());
+  });
+
   extraDiscount = computed(() => {
-    const rawTotal = this.saleTotal() - this.couponDiscount() + this.shippingCharge();
-    return Math.max(0, rawTotal % 5);
+    return Math.max(0, this.rawTotal() % 5);
   });
 
   grandTotal = computed(() => {
-    return Math.max(0, Math.round(this.saleTotal() - this.couponDiscount() + this.shippingCharge() - this.extraDiscount()));
+    return Math.max(0, Math.round(this.rawTotal() - this.extraDiscount()));
   });
 
   divisions = signal<any[]>([]);
   areas = signal<any[]>([]);
   zones = signal<any[]>([]);
+
+  filteredCities = computed(() => {
+    const query = this.searchCityQuery().trim().toLowerCase();
+    const all = this.divisions();
+    if (!query) return all;
+    return all.filter(d => (d.name && d.name.toLowerCase().includes(query)) || (d.nameEn && d.nameEn.toLowerCase().includes(query)));
+  });
+
+  filteredAreasList = computed(() => {
+    const query = this.searchAreaQuery().trim().toLowerCase();
+    const all = this.areas();
+    if (!query) return all;
+    return all.filter(a => (a.name && a.name.toLowerCase().includes(query)) || (a.nameEn && a.nameEn.toLowerCase().includes(query)));
+  });
 
   // Search
   searchDistrict = signal<string>('');
@@ -158,9 +188,70 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
+    if (!target.closest('.city-area-picker-container')) {
+      this.isCityAreaPickerOpen.set(false);
+    }
     if (!target.closest('app-general-dropdown')) {
       this._selectToggle.selectToggle.next('');
     }
+  }
+
+  // City / Area Picker Methods (Rokomari-style)
+  toggleCityAreaPicker() {
+    this.isCityAreaPickerOpen.set(!this.isCityAreaPickerOpen());
+  }
+
+  selectCity(city: any) {
+    this.selectedCity.set(city);
+    this.cityAreaStep.set('area');
+    this.searchAreaQuery.set('');
+    this.areaService.getAreaByParentId(city._id, 'name').subscribe(res => {
+      const data = (res.data || []).map((i: any) => ({ ...i, id: i._id }));
+      this.areas.set(data);
+      this.filteredAreas.set(data);
+    });
+  }
+
+  selectArea(area: any) {
+    const city = this.selectedCity();
+    this.selectedCityAreaLabel.set(`${city?.name}, ${area?.name}`);
+    this.checkoutForm.patchValue({
+      division: city?._id,
+      area: area?._id
+    });
+
+    const isDhaka = city && (city.name.toLowerCase().includes('dhaka') || city.name.includes('ঢাকা'));
+    if (isDhaka) {
+      this.checkoutForm.get('deliveryChargeType')?.setValue('inside_dhaka');
+    } else {
+      this.checkoutForm.get('deliveryChargeType')?.setValue('outside_dhaka');
+    }
+
+    this.isCityAreaPickerOpen.set(false);
+    this.updateShippingCharge();
+  }
+
+  backToCityStep() {
+    this.cityAreaStep.set('city');
+    this.searchCityQuery.set('');
+  }
+
+  // Terms Modal Methods
+  openTermsModal(event?: MouseEvent) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.showTermsModal.set(true);
+  }
+
+  closeTermsModal() {
+    this.showTermsModal.set(false);
+  }
+
+  acceptTermsAndClose() {
+    this.checkoutForm.get('agreeTerms')?.setValue(true);
+    this.showTermsModal.set(false);
   }
 
   ngOnInit(): void {
@@ -277,12 +368,13 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       addressType: ['home', Validators.required],
       name: ['', Validators.required],
       phoneNo: ['', [Validators.required, Validators.pattern(/^(01)[3-9][0-9]{8}$/)]],
+      alternativePhoneNo: ['', [Validators.pattern(/^(01)[3-9][0-9]{8}$/)]],
       division: [null, Validators.required],
       area: [null, Validators.required],
       zone: [null],
       address: ['', Validators.required],
       paymentMethod: ['cash_on_delivery', Validators.required],
-      deliveryChargeType: [{ value: 'inside_dhaka', disabled: true }, Validators.required],
+      deliveryChargeType: ['inside_dhaka', Validators.required],
       courier: ['standard', Validators.required],
       agreeTerms: [true, Validators.requiredTrue],
       note: ['']
@@ -321,30 +413,47 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
 
     const bookTotal = this.saleTotal();
-    const courier = this.checkoutForm.get('courier')?.value;
-    const type = this.checkoutForm.get('deliveryChargeType')?.value;
+    const courier = this.checkoutForm?.get('courier')?.value;
+    const type = this.checkoutForm?.get('deliveryChargeType')?.value;
 
-    let baseDelivery = 60;
+    let baseDelivery = this.deliveryInDhaka() || 60;
     let extraCharge = 0;
 
     if (courier === 'sundarban') {
-      baseDelivery = 60;
+      baseDelivery = this.deliveryInDhaka() || 60;
       const extraThousands = bookTotal > 1000 ? Math.ceil((bookTotal - 1000) / 1000) : 0;
       extraCharge = extraThousands * 15;
     } else {
       // Standard / Pathao
       if (type === 'inside_dhaka') {
-        baseDelivery = 60;
+        baseDelivery = this.deliveryInDhaka() || 60;
         const extraThousands = bookTotal > 1000 ? Math.ceil((bookTotal - 1000) / 1000) : 0;
         extraCharge = extraThousands * 15;
       } else {
-        baseDelivery = 110;
+        baseDelivery = this.deliveryOutsideDhaka() || 110;
         const extraThousands = bookTotal > 1000 ? Math.ceil((bookTotal - 1000) / 1000) : 0;
         extraCharge = extraThousands * 20;
       }
     }
 
     this.shippingCharge.set(baseDelivery + extraCharge);
+  }
+
+  private fetchShippingCharge() {
+    this.shippingService.getShippingCharge().subscribe({
+      next: (res) => {
+        if (res && res.data) {
+          if (res.data.deliveryInDhaka !== undefined && res.data.deliveryInDhaka !== null) {
+            this.deliveryInDhaka.set(res.data.deliveryInDhaka);
+          }
+          if (res.data.deliveryOutsideDhaka !== undefined && res.data.deliveryOutsideDhaka !== null) {
+            this.deliveryOutsideDhaka.set(res.data.deliveryOutsideDhaka);
+          }
+          this.updateShippingCharge();
+        }
+      },
+      error: () => {}
+    });
   }
 
   applyCoupon() {
@@ -394,23 +503,55 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   private fetchCarts() {
+    const rawSelected = typeof localStorage !== 'undefined' ? localStorage.getItem(SELECTED_CHECKOUT_ITEMS_KEY) : null;
+    let selectedCartIds: string[] = [];
+    let selectedProductIds: string[] = [];
+    if (rawSelected) {
+      try {
+        const parsed = JSON.parse(rawSelected);
+        selectedCartIds = parsed.cartIds || [];
+        selectedProductIds = parsed.productIds || [];
+      } catch (e) {}
+    }
+
     if (this.userService.getUserStatus()) {
-      // Logged-in: fetch from server (already has full product objects)
+      // Logged-in: fetch from server
       this.cartService.getCartByUser().subscribe(res => {
-        if (res.success) {
-          this.carts.set(res.data);
+        if (res.success && res.data) {
+          let list = res.data;
+          if (selectedCartIds.length > 0 || selectedProductIds.length > 0) {
+            list = list.filter(item => {
+              const cId = item._id;
+              const pId = typeof item.product === 'object' ? (item.product as any)?._id : item.product;
+              return (cId && selectedCartIds.includes(cId)) || (pId && (selectedCartIds.includes(pId) || selectedProductIds.includes(pId)));
+            });
+          }
+          this.carts.set(list);
           this.calculateSubTotal();
         }
       });
     } else {
       // Guest: read local, then resolve product details from API
-      this.fetchLocalCart();
+      this.fetchLocalCart(selectedCartIds, selectedProductIds);
     }
   }
 
-  private fetchLocalCart() {
-    const items = this.cartService.getCartItemFromLocalStorage();
+  private fetchLocalCart(selectedCartIds: string[] = [], selectedProductIds: string[] = []) {
+    let items = this.cartService.getCartItemFromLocalStorage();
     if (!items || items.length === 0) {
+      this.carts.set([]);
+      return;
+    }
+
+    if (selectedCartIds.length > 0 || selectedProductIds.length > 0) {
+      items = items.filter(item => {
+        const cId = item._id;
+        const pId = typeof item.product === 'object' ? (item.product as any)?._id : item.product;
+        return (cId && selectedCartIds.includes(cId)) || (pId && (selectedCartIds.includes(pId) || selectedProductIds.includes(pId)));
+      });
+    }
+
+    if (items.length === 0) {
       this.carts.set([]);
       return;
     }
@@ -418,7 +559,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     const productIds = items.filter(i => !i.cartType || i.cartType === 2).map(i => i.product as string);
     const packageIds = items.filter(i => i.cartType === 1).map(i => i.specialPackage as string);
 
-    const productObs = this.productService.getProductByIds(productIds, 'name nameEn slug regularPrice salePrice discountType discountAmount images freeDelivery isPreOrder');
+    const productObs = this.productService.getProductByIds(productIds, 'name nameEn slug regularPrice salePrice discountType discountAmount images freeDelivery isPreOrder author');
     const packageObs = this.comboPackageService.getProductByIds(packageIds);
 
     forkJoin([productObs, packageObs]).subscribe({
@@ -518,17 +659,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     }
   }
 
-  private fetchShippingCharge() {
-    this.shippingService.getShippingCharge().subscribe(res => {
-      if (res.data) {
-        this.deliveryInDhaka.set(res.data.deliveryInDhaka || 50);
-        this.deliveryOutsideDhaka.set(res.data.deliveryOutsideDhaka || 90);
-
-        this.updateShippingCharge();
-      }
-    });
-  }
-
   private fetchUserData() {
     this.userDataService.getLoggedInUserData().subscribe(res => {
       if (res && res.data) {
@@ -621,13 +751,20 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
     const totalDiscountAmount = this.productDiscount() + this.extraDiscount();
 
+    let finalNote = formValue.note || '';
+    if (formValue.alternativePhoneNo) {
+      finalNote = `[বিকল্প নম্বর: ${formValue.alternativePhoneNo}] ${finalNote}`.trim();
+    }
+
     const orderData = {
       name: formValue.name,
       phoneNo: formValue.phoneNo,
+      alternativePhoneNo: formValue.alternativePhoneNo || undefined,
       shippingAddress: formValue.address,
-      note: formValue.note,
+      note: finalNote,
       division: selectDivision,
       area: selectArea,
+      city: selectDivision?.name || '',
       zone: null,
       carts,
       cartData,

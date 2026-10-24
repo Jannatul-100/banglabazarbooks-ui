@@ -96,6 +96,17 @@ export class ProductDetailsAreaComponent implements OnInit, OnDestroy {
     return isEn ? (p.taglineEn || p.tagline) : p.tagline;
   });
 
+  isStockOut = computed(() => {
+    const p = this.product();
+    if (!p) return false;
+    if (p.isPreOrder) return false;
+    if (p.quantity !== undefined && p.quantity !== null && Number(p.quantity) <= 0) return true;
+    if (p.trackQuantity && (p.quantity === undefined || Number(p.quantity) <= 0)) return true;
+    if (p.status === 'stock_out') return true;
+    if (p.status && p.status !== 'publish' && p.status !== 'active') return true;
+    return false;
+  });
+
   // Dependencies
   private reloadService = inject(ReloadService);
   private cartService = inject(CartService);
@@ -203,6 +214,10 @@ export class ProductDetailsAreaComponent implements OnInit, OnDestroy {
 
   onAddToCart(event: MouseEvent) {
     event.stopPropagation();
+    if (this.isStockOut()) {
+      this.uiService.wrong('দুঃখিত! এই বইটি বর্তমানে স্টকে নেই, তাই কার্টে যোগ করা যাবে না।');
+      return;
+    }
     const data: Cart = {
       product: this.product()._id,
       selectedQty: this.localQuantity(),
@@ -220,6 +235,10 @@ export class ProductDetailsAreaComponent implements OnInit, OnDestroy {
 
   onAddToCartAndRedirect(event: MouseEvent) {
     event.stopPropagation();
+    if (this.isStockOut()) {
+      this.uiService.wrong('দুঃখিত! এই বইটি বর্তমানে স্টকে নেই, তাই অর্ডার করা সম্ভব নয়।');
+      return;
+    }
     const currentCart = this.cart();
     if (this.userService.getUserStatus()) {
       if (currentCart) {
